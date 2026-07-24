@@ -1,0 +1,13 @@
+apis:
+  internal@v1:
+    root: ./internal-api.json
+  supplier@v1:
+    root: ./supplier-api.json
+
+extends:
+  - minimal
+
+rules:
+  operation-operationId: error
+  no-ambiguous-paths: error
+  path-not-include-query: error

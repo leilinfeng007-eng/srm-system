@@ -1,0 +1,18 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+srm:
+  environment: production
+  security:
+    secure-cookies: true
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+server:
+  shutdown: graceful

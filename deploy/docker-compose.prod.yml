@@ -1,0 +1,105 @@
+name: ${COMPOSE_PROJECT_NAME:?COMPOSE_PROJECT_NAME is required}
+
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "/usr/local/bin/srm-mysql-secure-entrypoint.sh"]
+    environment:
+      MYSQL_DATABASE: ${SRM_DB_NAME:?SRM_DB_NAME is required}
+      MYSQL_USER: ${SRM_DB_USERNAME:?SRM_DB_USERNAME is required}
+      MYSQL_PASSWORD: ${SRM_DB_PASSWORD:?SRM_DB_PASSWORD is required}
+      MYSQL_ROOT_PASSWORD: ${SRM_DB_ROOT_PASSWORD:?SRM_DB_ROOT_PASSWORD is required}
+      TZ: UTC
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_0900_ai_ci", "--default-time-zone=+00:00"]
+    volumes:
+      - srm-mysql-data:/var/lib/mysql
+      - ./docker/mysql-secure-entrypoint.sh:/usr/local/bin/srm-mysql-secure-entrypoint.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    networks: [srm-production]
+
+  backend:
+    image: ${SRM_BACKEND_IMAGE:?SRM_BACKEND_IMAGE is required}
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SRM_DB_URL: jdbc:mysql://mysql:3306/${SRM_DB_NAME:?SRM_DB_NAME is required}?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SRM_DB_USERNAME: ${SRM_DB_USERNAME:?SRM_DB_USERNAME is required}
+      SRM_DB_PASSWORD: ${SRM_DB_PASSWORD:?SRM_DB_PASSWORD is required}
+      SRM_JWT_SECRET: ${SRM_JWT_SECRET:?SRM_JWT_SECRET is required}
+      SRM_BOOTSTRAP_ADMIN_USERNAME: ${SRM_BOOTSTRAP_ADMIN_USERNAME:?SRM_BOOTSTRAP_ADMIN_USERNAME is required}
+      SRM_BOOTSTRAP_ADMIN_PASSWORD: ${SRM_BOOTSTRAP_ADMIN_PASSWORD:?SRM_BOOTSTRAP_ADMIN_PASSWORD is required}
+      SRM_BOOTSTRAP_VIEWER_USERNAME: ${SRM_BOOTSTRAP_VIEWER_USERNAME:?SRM_BOOTSTRAP_VIEWER_USERNAME is required}
+      SRM_BOOTSTRAP_VIEWER_PASSWORD: ${SRM_BOOTSTRAP_VIEWER_PASSWORD:?SRM_BOOTSTRAP_VIEWER_PASSWORD is required}
+      SRM_CORS_ALLOWED_ORIGINS: ${SRM_CORS_ALLOWED_ORIGINS:?SRM_CORS_ALLOWED_ORIGINS is required}
+      SRM_LOG_LEVEL: ${SRM_LOG_LEVEL:-INFO}
+      SRM_SECURE_COOKIES: "true"
+      SRM_OPENAPI_ENABLED: "false"
+      TZ: UTC
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /actuator/health/readiness HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"status\":\"UP\"' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 45s
+    networks: [srm-production]
+
+  internal-web:
+    image: ${SRM_INTERNAL_WEB_IMAGE:?SRM_INTERNAL_WEB_IMAGE is required}
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 15
+    networks: [srm-production]
+
+  supplier-web:
+    image: ${SRM_SUPPLIER_WEB_IMAGE:?SRM_SUPPLIER_WEB_IMAGE is required}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 15
+    networks: [srm-production]
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    volumes:
+      - ./nginx/gateway/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      internal-web:
+        condition: service_healthy
+      supplier-web:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    ports:
+      - "${SRM_GATEWAY_PORT:?SRM_GATEWAY_PORT is required}:80"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 15
+    networks: [srm-production]
+
+volumes:
+  srm-mysql-data:
+    name: ${SRM_MYSQL_VOLUME_NAME:?SRM_MYSQL_VOLUME_NAME is required}
+
+networks:
+  srm-production:
+    driver: bridge

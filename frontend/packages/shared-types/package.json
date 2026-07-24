@@ -1,0 +1,11 @@
+{
+  "name": "@srm/shared-types",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "lint": "eslint src --max-warnings=0"
+  }
+}

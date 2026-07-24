@@ -1,0 +1,481 @@
+{
+  "components": {
+    "schemas": {
+      "ApiResponseListMenuNode": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/MenuNode"
+            },
+            "type": "array"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseListModuleMeta": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/ModuleMeta"
+            },
+            "type": "array"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseTokenResponse": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/TokenResponse"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseUserPrincipalResponse": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserPrincipalResponse"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseVoid": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseWorkbenchBaselineResponse": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/WorkbenchBaselineResponse"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LoginRequest": {
+        "properties": {
+          "password": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          },
+          "username": {
+            "maxLength": 64,
+            "minLength": 0,
+            "type": "string"
+          }
+        },
+        "required": [
+          "password",
+          "username"
+        ],
+        "type": "object"
+      },
+      "MenuNode": {
+        "properties": {
+          "componentKey": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "menuCode": {
+            "type": "string"
+          },
+          "permission": {
+            "type": "string"
+          },
+          "route": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ModuleMeta": {
+        "properties": {
+          "backendPackage": {
+            "type": "string"
+          },
+          "domainCode": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "permissionPrefix": {
+            "type": "string"
+          },
+          "phase": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "routePrefix": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TokenResponse": {
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "expiresInSeconds": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "tokenType": {
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserPrincipalResponse"
+          }
+        },
+        "type": "object"
+      },
+      "UserPrincipalResponse": {
+        "properties": {
+          "displayName": {
+            "type": "string"
+          },
+          "permissions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "userId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "WorkbenchBaselineResponse": {
+        "properties": {
+          "databaseReachable": {
+            "type": "boolean"
+          },
+          "moduleCode": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "内部用户认证、RBAC、动态菜单及阶段0工程基线接口。",
+    "title": "SRM 内部管理端 API",
+    "version": "v1"
+  },
+  "openapi": "3.0.1",
+  "paths": {
+    "/api/v1/auth/login": {
+      "post": {
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseTokenResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [],
+        "summary": "内部用户登录",
+        "tags": [
+          "auth-controller"
+        ]
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "退出当前会话",
+        "tags": [
+          "auth-controller"
+        ]
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserPrincipalResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "获取当前内部用户",
+        "tags": [
+          "auth-controller"
+        ]
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "operationId": "refresh",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseTokenResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [],
+        "summary": "刷新访问令牌",
+        "tags": [
+          "auth-controller"
+        ]
+      }
+    },
+    "/api/v1/meta/modules": {
+      "get": {
+        "operationId": "modules",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListModuleMeta"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "获取后端模块元数据",
+        "tags": [
+          "meta-controller"
+        ]
+      }
+    },
+    "/api/v1/navigation/menus": {
+      "get": {
+        "operationId": "menus",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListMenuNode"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "获取当前用户动态菜单",
+        "tags": [
+          "navigation-controller"
+        ]
+      }
+    },
+    "/api/v1/workbench/baseline": {
+      "get": {
+        "operationId": "baseline",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWorkbenchBaselineResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "获取工作台架构基线",
+        "tags": [
+          "workbench-baseline-controller"
+        ]
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "servers": [
+    {
+      "description": "通过当前站点的同源网关访问",
+      "url": "/"
+    }
+  ]
+}

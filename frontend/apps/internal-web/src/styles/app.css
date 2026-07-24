@@ -1,0 +1,2 @@
+#app { min-height: 100vh; }
+.el-button--primary { --el-button-bg-color: var(--srm-accent); --el-button-border-color: var(--srm-accent); --el-button-hover-bg-color: var(--srm-accent-strong); --el-button-hover-border-color: var(--srm-accent-strong); }

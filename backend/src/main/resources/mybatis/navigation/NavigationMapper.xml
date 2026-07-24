@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.srm.platform.navigation.infrastructure.persistence.mapper.NavigationMapper">
+    <resultMap id="navigationMenuRow"
+               type="com.srm.platform.navigation.infrastructure.persistence.dto.NavigationMenuRow">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="menuCode" column="menu_code"/>
+        <result property="label" column="label"/>
+        <result property="route" column="route"/>
+        <result property="componentKey" column="component_key"/>
+        <result property="permission" column="permission_code"/>
+        <result property="sortOrder" column="sort_order"/>
+    </resultMap>
+
+    <select id="selectGrantedRows" resultMap="navigationMenuRow">
+        SELECT DISTINCT m.id, m.parent_id, m.menu_code, m.label, m.route,
+                        m.component_key, m.permission_code, m.sort_order
+        FROM sys_menu m
+        JOIN sys_role_menu rm ON rm.menu_id = m.id
+        JOIN sys_user_role ur ON ur.role_id = rm.role_id
+        JOIN sys_role r ON r.id = ur.role_id
+        WHERE ur.user_id = #{userId}
+          AND r.status = 'ACTIVE'
+          AND m.enabled = TRUE
+          AND m.visible = TRUE
+        ORDER BY m.sort_order, m.id
+    </select>
+</mapper>

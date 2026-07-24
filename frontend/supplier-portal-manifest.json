@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "entries": [
+    { "label": "首页/任务", "menuCode": "PORTAL_HOME", "route": "/portal", "componentKey": "portal/home/index", "permission": "portal:home:view", "sortOrder": 10, "phase": 0, "enabled": true },
+    { "label": "企业资料", "menuCode": "PORTAL_COMPANY", "route": "/portal/company", "componentKey": "portal/company/index", "permission": "portal:company:view", "sortOrder": 20, "phase": 0, "enabled": true },
+    { "label": "寻源与报价", "menuCode": "PORTAL_SOURCING", "route": "/portal/sourcing", "componentKey": "portal/sourcing/index", "permission": "portal:sourcing:view", "sortOrder": 30, "phase": 0, "enabled": true },
+    { "label": "合同与协议", "menuCode": "PORTAL_CONTRACT", "route": "/portal/contracts", "componentKey": "portal/contract/index", "permission": "portal:contract:view", "sortOrder": 40, "phase": 0, "enabled": true },
+    { "label": "订单", "menuCode": "PORTAL_ORDER", "route": "/portal/orders", "componentKey": "portal/order/index", "permission": "portal:order:view", "sortOrder": 50, "phase": 0, "enabled": true },
+    { "label": "发货与收货", "menuCode": "PORTAL_DELIVERY", "route": "/portal/delivery", "componentKey": "portal/delivery/index", "permission": "portal:delivery:view", "sortOrder": 60, "phase": 0, "enabled": true },
+    { "label": "质量", "menuCode": "PORTAL_QUALITY", "route": "/portal/quality", "componentKey": "portal/quality/index", "permission": "portal:quality:view", "sortOrder": 70, "phase": 0, "enabled": true },
+    { "label": "对账与发票", "menuCode": "PORTAL_SETTLEMENT", "route": "/portal/settlement", "componentKey": "portal/settlement/index", "permission": "portal:settlement:view", "sortOrder": 80, "phase": 0, "enabled": true },
+    { "label": "绩效与改善", "menuCode": "PORTAL_PERFORMANCE", "route": "/portal/performance", "componentKey": "portal/performance/index", "permission": "portal:performance:view", "sortOrder": 90, "phase": 0, "enabled": true }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@srm/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@srm/shared-types": "*",
+    "openapi-fetch": "0.17.0"
+  },
+  "scripts": {
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "lint": "eslint src --max-warnings=0"
+  }
+}

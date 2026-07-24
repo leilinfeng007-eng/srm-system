@@ -1,0 +1,18 @@
+{
+  "components": {
+    "securitySchemes": {}
+  },
+  "info": {
+    "description": "供应商端独立契约；阶段0未发布供应商业务操作。",
+    "title": "SRM 供应商端 API",
+    "version": "v1"
+  },
+  "openapi": "3.0.1",
+  "paths": {},
+  "servers": [
+    {
+      "description": "通过当前站点的同源网关访问",
+      "url": "/"
+    }
+  ]
+}

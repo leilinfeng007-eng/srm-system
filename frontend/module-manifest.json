@@ -1,0 +1,1106 @@
+{
+  "version": "1.0",
+  "domains": [
+    {
+      "domainCode": "workbench",
+      "label": "工作台",
+      "menuCode": "MENU_WORKBENCH",
+      "backendPackage": "com.srm.workbench",
+      "frontendDirectory": "views/workbench",
+      "sortOrder": 10,
+      "phase": 1,
+      "enabled": true,
+      "features": [
+        {
+          "domainCode": "workbench",
+          "menuCode": "MENU_WORKBENCH_HOME",
+          "label": "工作台首页",
+          "route": "/workbench",
+          "componentKey": "workbench/home/index",
+          "permission": "workbench:home:view",
+          "sortOrder": 10,
+          "phase": 1,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "domainCode": "supplier",
+      "label": "供应商管理",
+      "menuCode": "MENU_SUPPLIER",
+      "backendPackage": "com.srm.supplier",
+      "frontendDirectory": "views/supplier",
+      "sortOrder": 20,
+      "phase": 2,
+      "enabled": true,
+      "features": [
+        {
+          "domainCode": "supplier",
+          "menuCode": "MENU_SUPPLIER_POOL",
+          "label": "供应商资源池",
+          "route": "/supplier/pool",
+          "componentKey": "supplier/pool/index",
+          "permission": "supplier:pool:view",
+          "sortOrder": 10,
+          "phase": 2,
+          "enabled": true
+        },
+        {
+          "domainCode": "supplier",
+          "menuCode": "MENU_SUPPLIER_REGISTRATION",
+          "label": "注册申请",
+          "route": "/supplier/registrations",
+          "componentKey": "supplier/registration/index",
+          "permission": "supplier:registration:view",
+          "sortOrder": 20,
+          "phase": 2,
+          "enabled": true
+        },
+        {
+          "domainCode": "supplier",
+          "menuCode": "MENU_SUPPLIER_PROFILE",
+          "label": "供应商档案",
+          "route": "/supplier/profiles",
+          "componentKey": "supplier/profile/index",
+          "permission": "supplier:profile:view",
+          "sortOrder": 30,
+          "phase": 2,
+          "enabled": true
+        },
+        {
+          "domainCode": "supplier",
+          "menuCode": "MENU_SUPPLIER_ADMISSION",
+          "label": "准入与认证",
+          "route": "/supplier/admissions",
+          "componentKey": "supplier/admission/index",
+          "permission": "supplier:admission:view",
+          "sortOrder": 40,
+          "phase": 2,
+          "enabled": true
+        },
+        {
+          "domainCode": "supplier",
+          "menuCode": "MENU_SUPPLIER_QUALIFICATION",
+          "label": "资质证照",
+          "route": "/supplier/qualifications",
+          "componentKey": "supplier/qualification/index",
+          "permission": "supplier:qualification:view",
+          "sortOrder": 50,
+          "phase": 2,
+          "enabled": true
+        },
+        {
+          "domainCode": "supplier",
+          "menuCode": "MENU_SUPPLIER_REVIEW_CHANGE",
+          "label": "复审与变更",
+          "route": "/supplier/reviews-changes",
+          "componentKey": "supplier/review-change/index",
+          "permission": "supplier:review-change:view",
+          "sortOrder": 60,
+          "phase": 2,
+          "enabled": true
+        },
+        {
+          "domainCode": "supplier",
+          "menuCode": "MENU_SUPPLIER_RESTRICTION",
+          "label": "冻结与退出",
+          "route": "/supplier/restrictions",
+          "componentKey": "supplier/restriction/index",
+          "permission": "supplier:restriction:view",
+          "sortOrder": 70,
+          "phase": 2,
+          "enabled": true
+        },
+        {
+          "domainCode": "supplier",
+          "menuCode": "MENU_SUPPLIER_USER",
+          "label": "供应商用户",
+          "route": "/supplier/users",
+          "componentKey": "supplier/user/index",
+          "permission": "supplier:user:view",
+          "sortOrder": 80,
+          "phase": 2,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "domainCode": "sourcing",
+      "label": "战略寻源",
+      "menuCode": "MENU_SOURCING",
+      "backendPackage": "com.srm.sourcing",
+      "frontendDirectory": "views/sourcing",
+      "sortOrder": 30,
+      "phase": 4,
+      "enabled": true,
+      "features": [
+        {
+          "domainCode": "sourcing",
+          "menuCode": "MENU_SOURCING_REQUIREMENT",
+          "label": "寻源需求",
+          "route": "/sourcing/requirements",
+          "componentKey": "sourcing/requirement/index",
+          "permission": "sourcing:requirement:view",
+          "sortOrder": 10,
+          "phase": 4,
+          "enabled": true
+        },
+        {
+          "domainCode": "sourcing",
+          "menuCode": "MENU_SOURCING_PROJECT",
+          "label": "寻源项目",
+          "route": "/sourcing/projects",
+          "componentKey": "sourcing/project/index",
+          "permission": "sourcing:project:view",
+          "sortOrder": 20,
+          "phase": 4,
+          "enabled": true
+        },
+        {
+          "domainCode": "sourcing",
+          "menuCode": "MENU_SOURCING_RFX",
+          "label": "RFI/RFQ",
+          "route": "/sourcing/rfx",
+          "componentKey": "sourcing/rfx/index",
+          "permission": "sourcing:rfx:view",
+          "sortOrder": 30,
+          "phase": 4,
+          "enabled": true
+        },
+        {
+          "domainCode": "sourcing",
+          "menuCode": "MENU_SOURCING_BID_AUCTION",
+          "label": "招投标/竞价",
+          "route": "/sourcing/bids-auctions",
+          "componentKey": "sourcing/bid-auction/index",
+          "permission": "sourcing:bid-auction:view",
+          "sortOrder": 40,
+          "phase": 4,
+          "enabled": true
+        },
+        {
+          "domainCode": "sourcing",
+          "menuCode": "MENU_SOURCING_QUOTATION",
+          "label": "供应商报价",
+          "route": "/sourcing/quotations",
+          "componentKey": "sourcing/quotation/index",
+          "permission": "sourcing:quotation:view",
+          "sortOrder": 50,
+          "phase": 4,
+          "enabled": true
+        },
+        {
+          "domainCode": "sourcing",
+          "menuCode": "MENU_SOURCING_CLARIFICATION",
+          "label": "澄清答疑",
+          "route": "/sourcing/clarifications",
+          "componentKey": "sourcing/clarification/index",
+          "permission": "sourcing:clarification:view",
+          "sortOrder": 60,
+          "phase": 4,
+          "enabled": true
+        },
+        {
+          "domainCode": "sourcing",
+          "menuCode": "MENU_SOURCING_EVALUATION_AWARD",
+          "label": "评审与定标",
+          "route": "/sourcing/evaluations-awards",
+          "componentKey": "sourcing/evaluation-award/index",
+          "permission": "sourcing:evaluation-award:view",
+          "sortOrder": 70,
+          "phase": 4,
+          "enabled": true
+        },
+        {
+          "domainCode": "sourcing",
+          "menuCode": "MENU_SOURCING_CONVERSION",
+          "label": "中选转化任务",
+          "route": "/sourcing/conversions",
+          "componentKey": "sourcing/conversion/index",
+          "permission": "sourcing:conversion:view",
+          "sortOrder": 80,
+          "phase": 4,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "domainCode": "contract",
+      "label": "合同与价格管理",
+      "menuCode": "MENU_CONTRACT",
+      "backendPackage": "com.srm.contract",
+      "frontendDirectory": "views/contract",
+      "sortOrder": 40,
+      "phase": 5,
+      "enabled": true,
+      "features": [
+        {
+          "domainCode": "contract",
+          "menuCode": "MENU_CONTRACT_CONTRACT",
+          "label": "合同台账",
+          "route": "/contract/contracts",
+          "componentKey": "contract/contract/index",
+          "permission": "contract:contract:view",
+          "sortOrder": 10,
+          "phase": 5,
+          "enabled": true
+        },
+        {
+          "domainCode": "contract",
+          "menuCode": "MENU_CONTRACT_AGREEMENT",
+          "label": "框架/补充协议",
+          "route": "/contract/agreements",
+          "componentKey": "contract/agreement/index",
+          "permission": "contract:agreement:view",
+          "sortOrder": 20,
+          "phase": 5,
+          "enabled": true
+        },
+        {
+          "domainCode": "contract",
+          "menuCode": "MENU_CONTRACT_PURCHASING_BASIS",
+          "label": "采购依据",
+          "route": "/contract/purchasing-bases",
+          "componentKey": "contract/purchasing-basis/index",
+          "permission": "contract:purchasing-basis:view",
+          "sortOrder": 30,
+          "phase": 5,
+          "enabled": true
+        },
+        {
+          "domainCode": "contract",
+          "menuCode": "MENU_CONTRACT_PRICE_CONDITION",
+          "label": "价格条件",
+          "route": "/contract/price-conditions",
+          "componentKey": "contract/price-condition/index",
+          "permission": "contract:price-condition:view",
+          "sortOrder": 40,
+          "phase": 5,
+          "enabled": true
+        },
+        {
+          "domainCode": "contract",
+          "menuCode": "MENU_CONTRACT_PRICE_VERSION",
+          "label": "调价与版本",
+          "route": "/contract/price-versions",
+          "componentKey": "contract/price-version/index",
+          "permission": "contract:price-version:view",
+          "sortOrder": 50,
+          "phase": 5,
+          "enabled": true
+        },
+        {
+          "domainCode": "contract",
+          "menuCode": "MENU_CONTRACT_RENEWAL_TERMINATION",
+          "label": "续签/终止",
+          "route": "/contract/renewals-terminations",
+          "componentKey": "contract/renewal-termination/index",
+          "permission": "contract:renewal-termination:view",
+          "sortOrder": 60,
+          "phase": 5,
+          "enabled": true
+        },
+        {
+          "domainCode": "contract",
+          "menuCode": "MENU_CONTRACT_PERFORMANCE_ALERT",
+          "label": "履约与临期预警",
+          "route": "/contract/performance-alerts",
+          "componentKey": "contract/performance-alert/index",
+          "permission": "contract:performance-alert:view",
+          "sortOrder": 70,
+          "phase": 5,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "domainCode": "source",
+      "label": "供应源管理",
+      "menuCode": "MENU_SOURCE",
+      "backendPackage": "com.srm.source",
+      "frontendDirectory": "views/source",
+      "sortOrder": 50,
+      "phase": 3,
+      "enabled": true,
+      "features": [
+        {
+          "domainCode": "source",
+          "menuCode": "MENU_SOURCE_CANDIDATE",
+          "label": "候选供应源",
+          "route": "/supply-source/candidates",
+          "componentKey": "source/candidate/index",
+          "permission": "source:candidate:view",
+          "sortOrder": 10,
+          "phase": 3,
+          "enabled": true
+        },
+        {
+          "domainCode": "source",
+          "menuCode": "MENU_SOURCE_TRIAL_CONDITIONAL",
+          "label": "试制/条件供应源",
+          "route": "/supply-source/trial-conditional",
+          "componentKey": "source/trial-conditional/index",
+          "permission": "source:trial-conditional:view",
+          "sortOrder": 20,
+          "phase": 3,
+          "enabled": true
+        },
+        {
+          "domainCode": "source",
+          "menuCode": "MENU_SOURCE_APPROVED",
+          "label": "正式供应源",
+          "route": "/supply-source/approved",
+          "componentKey": "source/approved/index",
+          "permission": "source:approved:view",
+          "sortOrder": 30,
+          "phase": 3,
+          "enabled": true
+        },
+        {
+          "domainCode": "source",
+          "menuCode": "MENU_SOURCE_QUOTA",
+          "label": "供应配额",
+          "route": "/supply-source/quotas",
+          "componentKey": "source/quota/index",
+          "permission": "source:quota:view",
+          "sortOrder": 40,
+          "phase": 3,
+          "enabled": true
+        },
+        {
+          "domainCode": "source",
+          "menuCode": "MENU_SOURCE_CAPACITY",
+          "label": "能力与交期",
+          "route": "/supply-source/capacities",
+          "componentKey": "source/capacity/index",
+          "permission": "source:capacity:view",
+          "sortOrder": 50,
+          "phase": 3,
+          "enabled": true
+        },
+        {
+          "domainCode": "source",
+          "menuCode": "MENU_SOURCE_RESTRICTION",
+          "label": "限制/暂停",
+          "route": "/supply-source/restrictions",
+          "componentKey": "source/restriction/index",
+          "permission": "source:restriction:view",
+          "sortOrder": 60,
+          "phase": 3,
+          "enabled": true
+        },
+        {
+          "domainCode": "source",
+          "menuCode": "MENU_SOURCE_HISTORY",
+          "label": "供应源变更历史",
+          "route": "/supply-source/history",
+          "componentKey": "source/history/index",
+          "permission": "source:history:view",
+          "sortOrder": 70,
+          "phase": 3,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "domainCode": "procurement",
+      "label": "采购协同",
+      "menuCode": "MENU_PROCUREMENT",
+      "backendPackage": "com.srm.procurement",
+      "frontendDirectory": "views/procurement",
+      "sortOrder": 60,
+      "phase": 6,
+      "enabled": true,
+      "features": [
+        {
+          "domainCode": "procurement",
+          "menuCode": "MENU_PROCUREMENT_REQUIREMENT",
+          "label": "采购需求",
+          "route": "/procurement/requirements",
+          "componentKey": "procurement/requirement/index",
+          "permission": "procurement:requirement:view",
+          "sortOrder": 10,
+          "phase": 6,
+          "enabled": true
+        },
+        {
+          "domainCode": "procurement",
+          "menuCode": "MENU_PROCUREMENT_MATCHING",
+          "label": "供应源匹配",
+          "route": "/procurement/matching",
+          "componentKey": "procurement/matching/index",
+          "permission": "procurement:matching:view",
+          "sortOrder": 20,
+          "phase": 6,
+          "enabled": true
+        },
+        {
+          "domainCode": "procurement",
+          "menuCode": "MENU_PROCUREMENT_GAP",
+          "label": "需求缺口",
+          "route": "/procurement/gaps",
+          "componentKey": "procurement/gap/index",
+          "permission": "procurement:gap:view",
+          "sortOrder": 30,
+          "phase": 6,
+          "enabled": true
+        },
+        {
+          "domainCode": "procurement",
+          "menuCode": "MENU_PROCUREMENT_ALLOCATION",
+          "label": "需求分配",
+          "route": "/procurement/allocations",
+          "componentKey": "procurement/allocation/index",
+          "permission": "procurement:allocation:view",
+          "sortOrder": 40,
+          "phase": 6,
+          "enabled": true
+        },
+        {
+          "domainCode": "procurement",
+          "menuCode": "MENU_PROCUREMENT_PURCHASE_ORDER",
+          "label": "采购订单",
+          "route": "/procurement/purchase-orders",
+          "componentKey": "procurement/purchase-order/index",
+          "permission": "procurement:purchase-order:view",
+          "sortOrder": 50,
+          "phase": 6,
+          "enabled": true
+        },
+        {
+          "domainCode": "procurement",
+          "menuCode": "MENU_PROCUREMENT_CONFIRMATION",
+          "label": "订单确认",
+          "route": "/procurement/confirmations",
+          "componentKey": "procurement/confirmation/index",
+          "permission": "procurement:confirmation:view",
+          "sortOrder": 60,
+          "phase": 6,
+          "enabled": true
+        },
+        {
+          "domainCode": "procurement",
+          "menuCode": "MENU_PROCUREMENT_CHANGE_CANCEL",
+          "label": "订单变更/取消",
+          "route": "/procurement/changes-cancellations",
+          "componentKey": "procurement/change-cancel/index",
+          "permission": "procurement:change-cancel:view",
+          "sortOrder": 70,
+          "phase": 6,
+          "enabled": true
+        },
+        {
+          "domainCode": "procurement",
+          "menuCode": "MENU_PROCUREMENT_FORECAST_PLAN",
+          "label": "预测与交付计划",
+          "route": "/procurement/forecast-plans",
+          "componentKey": "procurement/forecast-plan/index",
+          "permission": "procurement:forecast-plan:view",
+          "sortOrder": 80,
+          "phase": 7,
+          "enabled": false
+        }
+      ]
+    },
+    {
+      "domainCode": "delivery",
+      "label": "交付与收货协同",
+      "menuCode": "MENU_DELIVERY",
+      "backendPackage": "com.srm.delivery",
+      "frontendDirectory": "views/delivery",
+      "sortOrder": 70,
+      "phase": 7,
+      "enabled": true,
+      "features": [
+        {
+          "domainCode": "delivery",
+          "menuCode": "MENU_DELIVERY_PLAN",
+          "label": "交付计划",
+          "route": "/delivery/plans",
+          "componentKey": "delivery/plan/index",
+          "permission": "delivery:plan:view",
+          "sortOrder": 10,
+          "phase": 7,
+          "enabled": true
+        },
+        {
+          "domainCode": "delivery",
+          "menuCode": "MENU_DELIVERY_ASN",
+          "label": "ASN",
+          "route": "/delivery/asn",
+          "componentKey": "delivery/asn/index",
+          "permission": "delivery:asn:view",
+          "sortOrder": 20,
+          "phase": 7,
+          "enabled": true
+        },
+        {
+          "domainCode": "delivery",
+          "menuCode": "MENU_DELIVERY_PACKAGING_LABEL",
+          "label": "包装与标签",
+          "route": "/delivery/packaging-labels",
+          "componentKey": "delivery/packaging-label/index",
+          "permission": "delivery:packaging-label:view",
+          "sortOrder": 30,
+          "phase": 7,
+          "enabled": true
+        },
+        {
+          "domainCode": "delivery",
+          "menuCode": "MENU_DELIVERY_SHIPMENT",
+          "label": "发运/在途",
+          "route": "/delivery/shipments",
+          "componentKey": "delivery/shipment/index",
+          "permission": "delivery:shipment:view",
+          "sortOrder": 40,
+          "phase": 7,
+          "enabled": true
+        },
+        {
+          "domainCode": "delivery",
+          "menuCode": "MENU_DELIVERY_APPOINTMENT",
+          "label": "到货预约",
+          "route": "/delivery/appointments",
+          "componentKey": "delivery/appointment/index",
+          "permission": "delivery:appointment:view",
+          "sortOrder": 50,
+          "phase": 7,
+          "enabled": true
+        },
+        {
+          "domainCode": "delivery",
+          "menuCode": "MENU_DELIVERY_RECEIPT",
+          "label": "收货反馈",
+          "route": "/delivery/receipts",
+          "componentKey": "delivery/receipt/index",
+          "permission": "delivery:receipt:view",
+          "sortOrder": 60,
+          "phase": 7,
+          "enabled": true
+        },
+        {
+          "domainCode": "delivery",
+          "menuCode": "MENU_DELIVERY_QUANTITY_DIFFERENCE",
+          "label": "数量差异",
+          "route": "/delivery/quantity-differences",
+          "componentKey": "delivery/quantity-difference/index",
+          "permission": "delivery:quantity-difference:view",
+          "sortOrder": 70,
+          "phase": 7,
+          "enabled": true
+        },
+        {
+          "domainCode": "delivery",
+          "menuCode": "MENU_DELIVERY_RETURN",
+          "label": "退货发运",
+          "route": "/delivery/returns",
+          "componentKey": "delivery/return/index",
+          "permission": "delivery:return:view",
+          "sortOrder": 80,
+          "phase": 7,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "domainCode": "quality",
+      "label": "供应商质量管理",
+      "menuCode": "MENU_QUALITY",
+      "backendPackage": "com.srm.quality",
+      "frontendDirectory": "views/quality",
+      "sortOrder": 80,
+      "phase": 8,
+      "enabled": true,
+      "features": [
+        {
+          "domainCode": "quality",
+          "menuCode": "MENU_QUALITY_AUDIT",
+          "label": "审核计划",
+          "route": "/quality/audits",
+          "componentKey": "quality/audit/index",
+          "permission": "quality:audit:view",
+          "sortOrder": 10,
+          "phase": 8,
+          "enabled": true
+        },
+        {
+          "domainCode": "quality",
+          "menuCode": "MENU_QUALITY_MATERIAL_QUALIFICATION",
+          "label": "物料资格",
+          "route": "/quality/material-qualifications",
+          "componentKey": "quality/material-qualification/index",
+          "permission": "quality:material-qualification:view",
+          "sortOrder": 20,
+          "phase": 8,
+          "enabled": true
+        },
+        {
+          "domainCode": "quality",
+          "menuCode": "MENU_QUALITY_SAMPLE_TRIAL",
+          "label": "样件/试制",
+          "route": "/quality/samples-trials",
+          "componentKey": "quality/sample-trial/index",
+          "permission": "quality:sample-trial:view",
+          "sortOrder": 30,
+          "phase": 8,
+          "enabled": true
+        },
+        {
+          "domainCode": "quality",
+          "menuCode": "MENU_QUALITY_PRODUCTION_APPROVAL",
+          "label": "量产认可",
+          "route": "/quality/production-approvals",
+          "componentKey": "quality/production-approval/index",
+          "permission": "quality:production-approval:view",
+          "sortOrder": 40,
+          "phase": 8,
+          "enabled": true
+        },
+        {
+          "domainCode": "quality",
+          "menuCode": "MENU_QUALITY_INSPECTION",
+          "label": "检验结果",
+          "route": "/quality/inspections",
+          "componentKey": "quality/inspection/index",
+          "permission": "quality:inspection:view",
+          "sortOrder": 50,
+          "phase": 8,
+          "enabled": true
+        },
+        {
+          "domainCode": "quality",
+          "menuCode": "MENU_QUALITY_ISSUE",
+          "label": "质量异常",
+          "route": "/quality/issues",
+          "componentKey": "quality/issue/index",
+          "permission": "quality:issue:view",
+          "sortOrder": 60,
+          "phase": 8,
+          "enabled": true
+        },
+        {
+          "domainCode": "quality",
+          "menuCode": "MENU_QUALITY_SCAR_8D",
+          "label": "SCAR/8D",
+          "route": "/quality/scar-8d",
+          "componentKey": "quality/scar-8d/index",
+          "permission": "quality:scar-8d:view",
+          "sortOrder": 70,
+          "phase": 8,
+          "enabled": true
+        },
+        {
+          "domainCode": "quality",
+          "menuCode": "MENU_QUALITY_REWORK_REINSPECTION",
+          "label": "退货/返工/复验",
+          "route": "/quality/rework-reinspection",
+          "componentKey": "quality/rework-reinspection/index",
+          "permission": "quality:rework-reinspection:view",
+          "sortOrder": 80,
+          "phase": 8,
+          "enabled": true
+        },
+        {
+          "domainCode": "quality",
+          "menuCode": "MENU_QUALITY_SUPPLIER_CHANGE",
+          "label": "供应商变更",
+          "route": "/quality/supplier-changes",
+          "componentKey": "quality/supplier-change/index",
+          "permission": "quality:supplier-change:view",
+          "sortOrder": 90,
+          "phase": 8,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "domainCode": "settlement",
+      "label": "对账与结算协同",
+      "menuCode": "MENU_SETTLEMENT",
+      "backendPackage": "com.srm.settlement",
+      "frontendDirectory": "views/settlement",
+      "sortOrder": 90,
+      "phase": 9,
+      "enabled": true,
+      "features": [
+        {
+          "domainCode": "settlement",
+          "menuCode": "MENU_SETTLEMENT_RECONCILIATION",
+          "label": "对账单",
+          "route": "/settlement/reconciliations",
+          "componentKey": "settlement/reconciliation/index",
+          "permission": "settlement:reconciliation:view",
+          "sortOrder": 10,
+          "phase": 9,
+          "enabled": true
+        },
+        {
+          "domainCode": "settlement",
+          "menuCode": "MENU_SETTLEMENT_DIFFERENCE",
+          "label": "差异处理",
+          "route": "/settlement/differences",
+          "componentKey": "settlement/difference/index",
+          "permission": "settlement:difference:view",
+          "sortOrder": 20,
+          "phase": 9,
+          "enabled": true
+        },
+        {
+          "domainCode": "settlement",
+          "menuCode": "MENU_SETTLEMENT_INVOICE",
+          "label": "发票协同",
+          "route": "/settlement/invoices",
+          "componentKey": "settlement/invoice/index",
+          "permission": "settlement:invoice:view",
+          "sortOrder": 30,
+          "phase": 9,
+          "enabled": true
+        },
+        {
+          "domainCode": "settlement",
+          "menuCode": "MENU_SETTLEMENT_PAYMENT_REQUEST",
+          "label": "请款材料",
+          "route": "/settlement/payment-requests",
+          "componentKey": "settlement/payment-request/index",
+          "permission": "settlement:payment-request:view",
+          "sortOrder": 40,
+          "phase": 9,
+          "enabled": true
+        },
+        {
+          "domainCode": "settlement",
+          "menuCode": "MENU_SETTLEMENT_PAYABLE_STATUS",
+          "label": "应付状态",
+          "route": "/settlement/payable-status",
+          "componentKey": "settlement/payable-status/index",
+          "permission": "settlement:payable-status:view",
+          "sortOrder": 50,
+          "phase": 9,
+          "enabled": true
+        },
+        {
+          "domainCode": "settlement",
+          "menuCode": "MENU_SETTLEMENT_PAYMENT_RESULT",
+          "label": "付款结果",
+          "route": "/settlement/payment-results",
+          "componentKey": "settlement/payment-result/index",
+          "permission": "settlement:payment-result:view",
+          "sortOrder": 60,
+          "phase": 9,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "domainCode": "performance",
+      "label": "绩效与风险管理",
+      "menuCode": "MENU_PERFORMANCE",
+      "backendPackage": "com.srm.performance",
+      "frontendDirectory": "views/performance",
+      "sortOrder": 100,
+      "phase": 10,
+      "enabled": true,
+      "features": [
+        {
+          "domainCode": "performance",
+          "menuCode": "MENU_PERFORMANCE_INDICATOR_MODEL",
+          "label": "指标模型",
+          "route": "/performance/indicator-models",
+          "componentKey": "performance/indicator-model/index",
+          "permission": "performance:indicator-model:view",
+          "sortOrder": 10,
+          "phase": 10,
+          "enabled": true
+        },
+        {
+          "domainCode": "performance",
+          "menuCode": "MENU_PERFORMANCE_SCORE",
+          "label": "绩效评分",
+          "route": "/performance/scores",
+          "componentKey": "performance/score/index",
+          "permission": "performance:score:view",
+          "sortOrder": 20,
+          "phase": 10,
+          "enabled": true
+        },
+        {
+          "domainCode": "performance",
+          "menuCode": "MENU_PERFORMANCE_RATING",
+          "label": "评级结果",
+          "route": "/performance/ratings",
+          "componentKey": "performance/rating/index",
+          "permission": "performance:rating:view",
+          "sortOrder": 30,
+          "phase": 10,
+          "enabled": true
+        },
+        {
+          "domainCode": "performance",
+          "menuCode": "MENU_PERFORMANCE_RISK",
+          "label": "风险台账",
+          "route": "/performance/risks",
+          "componentKey": "performance/risk/index",
+          "permission": "performance:risk:view",
+          "sortOrder": 40,
+          "phase": 10,
+          "enabled": true
+        },
+        {
+          "domainCode": "performance",
+          "menuCode": "MENU_PERFORMANCE_ALERT",
+          "label": "预警事件",
+          "route": "/performance/alerts",
+          "componentKey": "performance/alert/index",
+          "permission": "performance:alert:view",
+          "sortOrder": 50,
+          "phase": 10,
+          "enabled": true
+        },
+        {
+          "domainCode": "performance",
+          "menuCode": "MENU_PERFORMANCE_IMPROVEMENT",
+          "label": "改善计划",
+          "route": "/performance/improvements",
+          "componentKey": "performance/improvement/index",
+          "permission": "performance:improvement:view",
+          "sortOrder": 60,
+          "phase": 10,
+          "enabled": true
+        },
+        {
+          "domainCode": "performance",
+          "menuCode": "MENU_PERFORMANCE_SUPPLY_DECISION",
+          "label": "供应决策",
+          "route": "/performance/supply-decisions",
+          "componentKey": "performance/supply-decision/index",
+          "permission": "performance:supply-decision:view",
+          "sortOrder": 70,
+          "phase": 10,
+          "enabled": true
+        },
+        {
+          "domainCode": "performance",
+          "menuCode": "MENU_PERFORMANCE_SECOND_SOURCE",
+          "label": "第二供应源计划",
+          "route": "/performance/second-source-plans",
+          "componentKey": "performance/second-source/index",
+          "permission": "performance:second-source:view",
+          "sortOrder": 80,
+          "phase": 10,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "domainCode": "masterdata",
+      "label": "基础数据中心",
+      "menuCode": "MENU_MASTERDATA",
+      "backendPackage": "com.srm.masterdata",
+      "frontendDirectory": "views/masterdata",
+      "sortOrder": 110,
+      "phase": 1,
+      "enabled": true,
+      "features": [
+        {
+          "domainCode": "masterdata",
+          "menuCode": "MENU_MASTERDATA_ORGANIZATION",
+          "label": "企业组织",
+          "route": "/master-data/organizations",
+          "componentKey": "masterdata/organization/index",
+          "permission": "masterdata:organization:view",
+          "sortOrder": 10,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "masterdata",
+          "menuCode": "MENU_MASTERDATA_PURCHASING_ORG",
+          "label": "采购组织",
+          "route": "/master-data/purchasing-organizations",
+          "componentKey": "masterdata/purchasing-organization/index",
+          "permission": "masterdata:purchasing-organization:view",
+          "sortOrder": 20,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "masterdata",
+          "menuCode": "MENU_MASTERDATA_PLANT_RECEIVING",
+          "label": "工厂/收货地点",
+          "route": "/master-data/plants-receiving",
+          "componentKey": "masterdata/plant-receiving/index",
+          "permission": "masterdata:plant-receiving:view",
+          "sortOrder": 30,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "masterdata",
+          "menuCode": "MENU_MASTERDATA_MATERIAL",
+          "label": "物料",
+          "route": "/master-data/materials",
+          "componentKey": "masterdata/material/index",
+          "permission": "masterdata:material:view",
+          "sortOrder": 40,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "masterdata",
+          "menuCode": "MENU_MASTERDATA_CATEGORY",
+          "label": "品类",
+          "route": "/master-data/categories",
+          "componentKey": "masterdata/category/index",
+          "permission": "masterdata:category:view",
+          "sortOrder": 50,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "masterdata",
+          "menuCode": "MENU_MASTERDATA_UNIT_CURRENCY_TAX",
+          "label": "单位/币种/税码",
+          "route": "/master-data/units-currencies-taxes",
+          "componentKey": "masterdata/unit-currency-tax/index",
+          "permission": "masterdata:unit-currency-tax:view",
+          "sortOrder": 60,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "masterdata",
+          "menuCode": "MENU_MASTERDATA_DELIVERY_LOCATION",
+          "label": "交付地点",
+          "route": "/master-data/delivery-locations",
+          "componentKey": "masterdata/delivery-location/index",
+          "permission": "masterdata:delivery-location:view",
+          "sortOrder": 70,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "masterdata",
+          "menuCode": "MENU_MASTERDATA_EXTERNAL_MAPPING",
+          "label": "外围映射",
+          "route": "/master-data/external-mappings",
+          "componentKey": "masterdata/external-mapping/index",
+          "permission": "masterdata:external-mapping:view",
+          "sortOrder": 80,
+          "phase": 1,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "domainCode": "system",
+      "label": "系统管理",
+      "menuCode": "MENU_SYSTEM",
+      "backendPackage": "com.srm.system",
+      "frontendDirectory": "views/system",
+      "sortOrder": 120,
+      "phase": 1,
+      "enabled": true,
+      "features": [
+        {
+          "domainCode": "system",
+          "menuCode": "MENU_SYSTEM_USER",
+          "label": "用户",
+          "route": "/system/users",
+          "componentKey": "system/user/index",
+          "permission": "system:user:view",
+          "sortOrder": 10,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "system",
+          "menuCode": "MENU_SYSTEM_ROLE",
+          "label": "角色与挂载用户",
+          "route": "/system/roles",
+          "componentKey": "system/role/index",
+          "permission": "system:role:view",
+          "sortOrder": 20,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "system",
+          "menuCode": "MENU_SYSTEM_PERMISSION",
+          "label": "权限与数据域",
+          "route": "/system/permissions",
+          "componentKey": "system/permission/index",
+          "permission": "system:permission:view",
+          "sortOrder": 30,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "system",
+          "menuCode": "MENU_SYSTEM_WORKFLOW",
+          "label": "流程",
+          "route": "/system/workflows",
+          "componentKey": "system/workflow/index",
+          "permission": "system:workflow:view",
+          "sortOrder": 40,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "system",
+          "menuCode": "MENU_SYSTEM_DICTIONARY_PARAMETER",
+          "label": "字典参数",
+          "route": "/system/dictionaries-parameters",
+          "componentKey": "system/dictionary-parameter/index",
+          "permission": "system:dictionary-parameter:view",
+          "sortOrder": 50,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "system",
+          "menuCode": "MENU_SYSTEM_TEMPLATE_ATTACHMENT",
+          "label": "模板附件",
+          "route": "/system/templates-attachments",
+          "componentKey": "system/template-attachment/index",
+          "permission": "system:template-attachment:view",
+          "sortOrder": 60,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "system",
+          "menuCode": "MENU_SYSTEM_MESSAGE",
+          "label": "消息",
+          "route": "/system/messages",
+          "componentKey": "system/message/index",
+          "permission": "system:message:view",
+          "sortOrder": 70,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "system",
+          "menuCode": "MENU_SYSTEM_AUDIT_LOG",
+          "label": "审计日志",
+          "route": "/system/audit-logs",
+          "componentKey": "system/audit-log/index",
+          "permission": "system:audit-log:view",
+          "sortOrder": 80,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "system",
+          "menuCode": "MENU_SYSTEM_INTEGRATION_JOB",
+          "label": "接口与任务监控",
+          "route": "/system/integrations-jobs",
+          "componentKey": "system/integration-job/index",
+          "permission": "system:integration-job:view",
+          "sortOrder": 90,
+          "phase": 1,
+          "enabled": true
+        }
+      ]
+    }
+  ]
+}

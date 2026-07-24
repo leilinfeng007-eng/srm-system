@@ -1,0 +1,13 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+srm:
+  environment: development
+
+springdoc:
+  api-docs:
+    enabled: ${SRM_OPENAPI_ENABLED:true}
+  swagger-ui:
+    enabled: ${SRM_OPENAPI_ENABLED:true}

@@ -1,0 +1,42 @@
+{
+  "name": "srm-system",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22 <25",
+    "npm": ">=10"
+  },
+  "workspaces": [
+    "frontend/apps/*",
+    "frontend/packages/*"
+  ],
+  "scripts": {
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present && node --test scripts/tests/*.test.mjs",
+    "build": "npm run build --workspaces --if-present",
+    "openapi:check": "node scripts/check-openapi.mjs",
+    "openapi:update": "node scripts/check-openapi.mjs --write",
+    "openapi:baseline": "node scripts/check-openapi.mjs --write --establish-baseline",
+    "validate:skeleton": "node scripts/validate-skeleton.mjs",
+    "generate:skeleton": "node scripts/generate-skeleton.mjs --write"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@redocly/cli": "2.40.0",
+    "@types/node": "^22.10.5",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "eslint": "^9.17.0",
+    "eslint-plugin-vue": "^9.32.0",
+    "globals": "^15.14.0",
+    "openapi-diff": "0.24.1",
+    "openapi-typescript": "7.13.0",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.19.1",
+    "vite": "^6.0.7",
+    "vue-tsc": "^2.2.0"
+  },
+  "overrides": {
+    "js-yaml": "4.3.0"
+  }
+}

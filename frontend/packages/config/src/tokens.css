@@ -1,0 +1,17 @@
+:root {
+  --srm-ink: #18324a;
+  --srm-muted: #64748b;
+  --srm-accent: #0f766e;
+  --srm-accent-strong: #115e59;
+  --srm-border: #dbe4ea;
+  --srm-surface: #f4f7f9;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  color: var(--srm-ink);
+  background: var(--srm-surface);
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--srm-surface); }
+button, input { font: inherit; }
+a { color: inherit; }
