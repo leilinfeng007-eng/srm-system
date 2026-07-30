@@ -1,0 +1,323 @@
+name: SRM CI and TCR Release
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: srm-release-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  TCR_REGISTRY: ccr.ccs.tencentyun.com
+  TCR_NAMESPACE: leizi114
+
+jobs:
+  project-validation:
+    name: Compile, test and validate project
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Set up Java 17 with Maven cache
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+
+      - name: Set up Node.js 22 with npm cache
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Compile and test backend
+        run: ./scripts/maven-command.sh -f backend/pom.xml -B clean test
+
+      - name: Install workspace dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Validate OpenAPI contracts
+        run: npm run openapi:check
+
+      - name: Lint all frontend workspaces
+        run: npm run lint
+
+      - name: Type-check all frontend workspaces
+        run: npm run typecheck
+
+      - name: Test all frontend workspaces
+        run: npm test
+
+      - name: Build internal web
+        run: npm run build --workspace=@srm/internal-web
+
+      - name: Build supplier web
+        run: npm run build --workspace=@srm/supplier-web
+
+      - name: Validate architecture and skeleton
+        run: |
+          node scripts/validate-architecture.mjs
+          node scripts/generate-skeleton.mjs
+          node scripts/validate-skeleton.mjs
+
+      - name: Validate migration files
+        run: ./scripts/check-migrations.sh
+
+      - name: Validate deployment and security configuration
+        run: |
+          node scripts/validate-deploy.mjs
+          node scripts/validate-security.mjs
+          docker compose --env-file .env.example config --quiet
+          if docker compose --env-file deploy/prod.env.example -f deploy/docker-compose.prod.yml config --quiet; then
+            echo 'Production environment example must remain intentionally incomplete.' >&2
+            exit 1
+          fi
+
+  flyway-validation:
+    name: Validate Flyway on MySQL 8.4
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+          MYSQL_ROOT_HOST: '%'
+          MYSQL_DATABASE: srm_ci
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot --silent"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=30
+          --health-start-period=20s
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Set up Java 17 with Maven cache
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+
+      - name: Package backend for migration verification
+        run: ./scripts/maven-command.sh -f backend/pom.xml -B package -DskipTests
+
+      - name: Apply and verify every Flyway migration
+        env:
+          MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
+        run: |
+          set -euo pipefail
+
+          export SPRING_PROFILES_ACTIVE=prod
+          export SRM_DB_URL='jdbc:mysql://127.0.0.1:3306/srm_ci?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true'
+          export SRM_DB_USERNAME=root
+          db_password="$(docker logs "$MYSQL_CONTAINER_ID" 2>&1 | sed -n 's/.*GENERATED ROOT PASSWORD: //p' | tail -n 1)"
+          if [[ -z "$db_password" ]]; then
+            echo 'Could not obtain the temporary MySQL root password.' >&2
+            exit 1
+          fi
+          export SRM_DB_PASSWORD="$db_password"
+          export SRM_JWT_SECRET="$(openssl rand -hex 32)"
+          export SRM_BOOTSTRAP_ADMIN_USERNAME=ci_admin
+          export SRM_BOOTSTRAP_ADMIN_PASSWORD="CiAdmin1!$(openssl rand -hex 12)"
+          export SRM_BOOTSTRAP_VIEWER_USERNAME=ci_viewer
+          export SRM_BOOTSTRAP_VIEWER_PASSWORD="CiViewer2!$(openssl rand -hex 12)"
+          export SRM_CORS_ALLOWED_ORIGINS=https://ci.invalid
+
+          jar_path="$(find backend/target -maxdepth 1 -name 'srm-backend-*.jar' -print -quit)"
+          if [[ -z "$jar_path" ]]; then
+            echo 'Backend JAR was not produced.' >&2
+            exit 1
+          fi
+
+          java -jar "$jar_path" >"$RUNNER_TEMP/srm-flyway.log" 2>&1 &
+          app_pid=$!
+          cleanup() {
+            if kill -0 "$app_pid" 2>/dev/null; then
+              kill "$app_pid"
+              wait "$app_pid" 2>/dev/null || true
+            fi
+          }
+          trap cleanup EXIT
+
+          ready=false
+          for attempt in {1..60}; do
+            if curl --fail --silent http://127.0.0.1:8080/actuator/health/readiness >/dev/null; then
+              ready=true
+              break
+            fi
+            if ! kill -0 "$app_pid" 2>/dev/null; then
+              echo 'Backend exited before Flyway validation completed.' >&2
+              sed -n '1,240p' "$RUNNER_TEMP/srm-flyway.log" >&2
+              exit 1
+            fi
+            sleep 2
+          done
+          if [[ "$ready" != true ]]; then
+            echo 'Backend readiness timed out during Flyway validation.' >&2
+            sed -n '1,240p' "$RUNNER_TEMP/srm-flyway.log" >&2
+            exit 1
+          fi
+
+          expected_versions="$(find backend/src/main/resources/db/migration -maxdepth 1 -name 'V*__*.sql' -exec basename {} \; | sed -E 's/^V([^_]+)__.*/\1/' | sort -V | paste -sd, -)"
+          applied_versions="$(docker exec --env MYSQL_PWD="$SRM_DB_PASSWORD" "$MYSQL_CONTAINER_ID" mysql --batch --skip-column-names -uroot srm_ci --execute="SELECT version FROM flyway_schema_history WHERE type = 'SQL' AND success = 1 ORDER BY installed_rank" | paste -sd, -)"
+          if [[ -z "$expected_versions" || "$applied_versions" != "$expected_versions" ]]; then
+            echo "Flyway version mismatch: expected [$expected_versions], applied [$applied_versions]." >&2
+            exit 1
+          fi
+
+          echo "Flyway migrations verified on isolated MySQL 8.4: $applied_versions"
+
+  publish-images:
+    name: Build and push linux/amd64 images
+    if: github.event_name != 'pull_request'
+    needs:
+      - project-validation
+      - flyway-validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Validate required TCR secrets
+        env:
+          TCR_USERNAME: ${{ secrets.TCR_USERNAME }}
+          TCR_PASSWORD: ${{ secrets.TCR_PASSWORD }}
+        run: |
+          if [[ -z "$TCR_USERNAME" || -z "$TCR_PASSWORD" ]]; then
+            echo 'Required TCR credentials are not configured.' >&2
+            exit 1
+          fi
+
+      - name: Log in to Tencent Cloud TCR
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.TCR_REGISTRY }}
+          username: ${{ secrets.TCR_USERNAME }}
+          password: ${{ secrets.TCR_PASSWORD }}
+
+      - name: Calculate immutable and rolling tags
+        id: image-tags
+        shell: bash
+        run: |
+          short_sha="${GITHUB_SHA::12}"
+          version_tag="sha-$short_sha"
+          {
+            echo "version=$version_tag"
+            echo 'backend<<EOF'
+            echo "$TCR_REGISTRY/$TCR_NAMESPACE/srm-backend:$version_tag"
+            if [[ "$GITHUB_REF" == 'refs/heads/main' ]]; then
+              echo "$TCR_REGISTRY/$TCR_NAMESPACE/srm-backend:latest"
+            fi
+            echo 'EOF'
+            echo 'internal<<EOF'
+            echo "$TCR_REGISTRY/$TCR_NAMESPACE/srm-internal-web:$version_tag"
+            if [[ "$GITHUB_REF" == 'refs/heads/main' ]]; then
+              echo "$TCR_REGISTRY/$TCR_NAMESPACE/srm-internal-web:latest"
+            fi
+            echo 'EOF'
+            echo 'supplier<<EOF'
+            echo "$TCR_REGISTRY/$TCR_NAMESPACE/srm-supplier-web:$version_tag"
+            if [[ "$GITHUB_REF" == 'refs/heads/main' ]]; then
+              echo "$TCR_REGISTRY/$TCR_NAMESPACE/srm-supplier-web:latest"
+            fi
+            echo 'EOF'
+          } >>"$GITHUB_OUTPUT"
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v7
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.image-tags.outputs.backend }}
+          cache-from: type=gha,scope=srm-backend
+          cache-to: type=gha,mode=max,scope=srm-backend
+
+      - name: Build and push internal web image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./deploy/docker/internal-web.Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.image-tags.outputs.internal }}
+          cache-from: type=gha,scope=srm-internal-web
+          cache-to: type=gha,mode=max,scope=srm-internal-web
+
+      - name: Build and push supplier web image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./deploy/docker/supplier-web.Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.image-tags.outputs.supplier }}
+          cache-from: type=gha,scope=srm-supplier-web
+          cache-to: type=gha,mode=max,scope=srm-supplier-web
+
+  workflow-summary:
+    name: Write workflow summary
+    if: always()
+    needs:
+      - project-validation
+      - flyway-validation
+      - publish-images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summarize validation and image references
+        env:
+          PROJECT_RESULT: ${{ needs.project-validation.result }}
+          FLYWAY_RESULT: ${{ needs.flyway-validation.result }}
+          PUBLISH_RESULT: ${{ needs.publish-images.result }}
+        run: |
+          short_sha="${GITHUB_SHA::12}"
+          version_tag="sha-$short_sha"
+          {
+            echo '# SRM build and release summary'
+            echo
+            echo "- Commit: \`$GITHUB_SHA\`"
+            echo "- Event: \`$GITHUB_EVENT_NAME\`"
+            echo "- Project validation: \`$PROJECT_RESULT\`"
+            echo "- Flyway validation: \`$FLYWAY_RESULT\`"
+            echo "- Image publishing: \`$PUBLISH_RESULT\`"
+            echo "- Platform: \`linux/amd64\`"
+            echo
+            echo '## Immutable image references'
+            echo
+            echo "- \`$TCR_REGISTRY/$TCR_NAMESPACE/srm-backend:$version_tag\`"
+            echo "- \`$TCR_REGISTRY/$TCR_NAMESPACE/srm-internal-web:$version_tag\`"
+            echo "- \`$TCR_REGISTRY/$TCR_NAMESPACE/srm-supplier-web:$version_tag\`"
+            if [[ "$GITHUB_REF" == 'refs/heads/main' && "$PUBLISH_RESULT" == 'success' ]]; then
+              echo
+              echo 'The same three repositories were also updated with the `latest` tag.'
+            fi
+            if [[ "$GITHUB_EVENT_NAME" == 'pull_request' ]]; then
+              echo
+              echo 'Pull request validation never logs in to TCR and does not build or push release images.'
+            fi
+          } >>"$GITHUB_STEP_SUMMARY"

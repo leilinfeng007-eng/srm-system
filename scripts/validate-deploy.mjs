@@ -40,6 +40,7 @@ for (const required of [
   'SRM_BACKEND_IMAGE',
   'SRM_INTERNAL_WEB_IMAGE',
   'SRM_SUPPLIER_WEB_IMAGE',
+  'SRM_IMAGE_TAG',
   'SRM_DB_NAME',
   'SRM_DB_USERNAME',
   'SRM_BOOTSTRAP_ADMIN_USERNAME',
@@ -49,6 +50,20 @@ for (const required of [
 ]) {
   check(productionCompose.includes(requiredExpression(required)), `生产Compose必须强制要求变量: ${required}`)
 }
+for (const image of ['SRM_BACKEND_IMAGE', 'SRM_INTERNAL_WEB_IMAGE', 'SRM_SUPPLIER_WEB_IMAGE']) {
+  check(
+    productionCompose.includes(`\${${image}:?${image} is required}:\${SRM_IMAGE_TAG:?SRM_IMAGE_TAG is required}`),
+    `生产Compose的${image}必须使用统一SRM_IMAGE_TAG`,
+  )
+}
+for (const repository of [
+  'ccr.ccs.tencentyun.com/leizi114/srm-backend',
+  'ccr.ccs.tencentyun.com/leizi114/srm-internal-web',
+  'ccr.ccs.tencentyun.com/leizi114/srm-supplier-web',
+]) {
+  check(productionEnvExample.includes(repository), `生产环境样例缺少TCR仓库: ${repository}`)
+}
+check(/^SRM_IMAGE_TAG=$/m.test(productionEnvExample), '生产环境样例的SRM_IMAGE_TAG必须留空')
 check(/SPRING_PROFILES_ACTIVE: prod/.test(productionCompose), '生产Compose必须激活prod配置')
 check(/SRM_SECURE_COOKIES: "true"/.test(productionCompose), '生产Compose必须启用Secure Cookie')
 check(/SRM_OPENAPI_ENABLED: "false"/.test(productionCompose), '生产Compose必须关闭OpenAPI')
