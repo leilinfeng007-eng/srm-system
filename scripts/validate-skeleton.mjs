@@ -40,11 +40,9 @@ const all = manifest.domains.flatMap((domain) => domain.features.map((feature) =
 const enabled = all.filter(({ feature }) => feature.enabled)
 const placeholders = enabled.filter(({ domain }) => domain.domainCode !== 'workbench')
 const hidden = all.filter(({ feature }) => !feature.enabled)
-requireValue(placeholders.length === 85, `V1.0二级占位页应为85，实际${placeholders.length}`)
-requireValue(enabled.length === 86, `含工作台的可访问页面应为86，实际${enabled.length}`)
-requireValue(hidden.length === 1, `隐藏预留应为1，实际${hidden.length}`)
-requireValue(hidden[0]?.feature.menuCode === 'MENU_PROCUREMENT_FORECAST_PLAN', '隐藏预留必须是预测与交付计划')
-requireValue(hidden[0]?.feature.phase === 7, '预测与交付计划必须预留在阶段7')
+requireValue(placeholders.length === 17, `阶段1非工作台页面应为17，实际${placeholders.length}`)
+requireValue(enabled.length === 18, `阶段1可访问页面应为18，实际${enabled.length}`)
+requireValue(hidden.length === 69, `阶段1后续隐藏页面应为69，实际${hidden.length}`)
 ensureUnique(manifest.domains, (item) => item.menuCode, '一级menuCode')
 ensureUnique(all, ({ feature }) => feature.menuCode, '二级menuCode')
 ensureUnique(all, ({ feature }) => feature.route, 'route')
@@ -87,9 +85,13 @@ for (const { feature } of all) {
     requireValue(existsSync(view), `页面目录缺失: ${feature.componentKey}`)
     requireValue(registry.includes(JSON.stringify(feature.componentKey)), `路由注册表缺少 ${feature.componentKey}`)
     requireValue(registry.includes(JSON.stringify(feature.route)), `路由注册表缺少 ${feature.route}`)
+    if (existsSync(view)) {
+      const pageSource = readFileSync(view, 'utf8')
+      requireValue(!pageSource.includes('SkeletonFeaturePage'), `阶段1页面仍是占位骨架: ${feature.componentKey}`)
+    }
   } else {
-    requireValue(!existsSync(view), `隐藏预留不得生成页面: ${feature.componentKey}`)
     requireValue(!registry.includes(feature.menuCode), `隐藏预留不得注册路由: ${feature.menuCode}`)
+    requireValue(!registry.includes(JSON.stringify(feature.route)), `隐藏预留路由泄漏: ${feature.route}`)
   }
 }
 
@@ -109,7 +111,6 @@ if (errors.length) {
 
 console.log('骨架一致性校验通过')
 console.log(`一级功能域: ${manifest.domains.length}`)
-console.log(`V1.0二级占位页: ${placeholders.length}`)
-console.log(`工作台首页: 1`)
-console.log(`阶段7隐藏预留: ${hidden.length}`)
+console.log(`阶段1启用页面: ${enabled.length}`)
+console.log(`后续隐藏页面: ${hidden.length}`)
 console.log(`供应商门户入口: ${supplier.entries.length}`)

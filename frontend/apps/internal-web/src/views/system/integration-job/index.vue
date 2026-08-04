@@ -1,16 +1,19 @@
 <script setup lang="ts">
-import { SkeletonFeaturePage } from '@srm/shared-ui'
+import { onMounted, reactive, ref } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import type { PageResult } from '@srm/shared-types'
+import { internalApi } from '../../../api/internal-api'
+import { usePermission } from '../../../composables/usePermission'
 
-const metadata = {
-  "domainLabel": "系统管理",
-  "featureLabel": "接口与任务监控",
-  "route": "/system/integrations-jobs",
-  "permission": "system:integration-job:view",
-  "menuCode": "MENU_SYSTEM_INTEGRATION_JOB",
-  "phase": 1
-} as const
+interface InboxEvent {id:number;eventId:string;sourceSystem:string;objectType:string;objectId:string;objectVersion:number;status:string;attemptCount:number;maxAttempts:number;nextRetryAt:string|null;lastError:string|null;receivedAt:string;processedAt:string|null}
+interface OutboxEvent {id:number;eventId:string;objectType:string;objectId:string;objectVersion:number;eventType:string;status:string;attemptCount:number;maxAttempts:number;nextRetryAt:string|null;lastError:string|null;createdAt:string}
+const tab=ref<'inbox'|'outbox'>('inbox'); const loading=ref(false); const page=ref(1);const pageSize=ref(20);const total=ref(0);const rows=ref<(InboxEvent|OutboxEvent)[]>([])
+const filter=reactive({status:''});const canRetry=usePermission('system:integration-job:retry')
+async function load(){loading.value=true;try{const q=new URLSearchParams({page:String(page.value),size:String(pageSize.value)});if(filter.status)q.set('status',filter.status);const r=await internalApi.get<PageResult<InboxEvent|OutboxEvent>>(`/system/${tab.value}-events?${q}`);rows.value=r.items;total.value=r.total}catch(e:unknown){rows.value=[];total.value=0;ElMessage.error((e as Error).message||'加载失败')}finally{loading.value=false}}
+function changeTab(){page.value=1;filter.status='';load()}
+async function retry(row:InboxEvent|OutboxEvent){try{await ElMessageBox.confirm(`确认重试事件 ${row.eventId}？`);await internalApi.post(`/system/${tab.value}-events/${row.id}/retry`);ElMessage.success('已恢复为可处理状态');load()}catch(e){void e}}
+function retryable(row:InboxEvent|OutboxEvent){return row.status==='FAILED'&&row.attemptCount<row.maxAttempts}
+onMounted(load)
 </script>
-
-<template>
-  <SkeletonFeaturePage v-bind="metadata" />
-</template>
+<template><section class="page"><el-card><el-tabs v-model="tab" @tab-change="changeTab"><el-tab-pane label="Inbox 入站" name="inbox"/><el-tab-pane label="Outbox 出站" name="outbox"/></el-tabs><div class="toolbar"><el-select v-model="filter.status" clearable placeholder="状态" style="width:180px" @change="page=1;load()"><el-option v-for="s in ['RECEIVED','PROCESSING','PROCESSED','IGNORED_STALE','READY','PUBLISHED','FAILED','DEAD','NO_TRANSPORT']" :key="s" :label="s" :value="s"/></el-select><el-button type="primary" @click="load">刷新</el-button></div><el-table v-loading="loading" :data="rows" border stripe style="margin-top:16px"><el-table-column prop="eventId" label="事件ID" min-width="190"/><el-table-column v-if="tab==='inbox'" prop="sourceSystem" label="来源系统" width="120"/><el-table-column v-else prop="eventType" label="事件类型" width="150"/><el-table-column prop="objectType" label="对象类型" width="130"/><el-table-column prop="objectId" label="对象ID" width="110"/><el-table-column prop="objectVersion" label="版本" width="70"/><el-table-column prop="status" label="状态" width="130"/><el-table-column label="重试" width="90"><template #default="{row}">{{row.attemptCount}} / {{row.maxAttempts}}</template></el-table-column><el-table-column prop="nextRetryAt" label="下次重试" width="180"/><el-table-column prop="lastError" label="失败原因" min-width="180" show-overflow-tooltip/><el-table-column label="操作" width="90"><template #default="{row}"><el-button v-if="canRetry&&retryable(row)" link type="primary" @click="retry(row)">重试</el-button></template></el-table-column></el-table><div class="pager"><el-pagination v-model:current-page="page" v-model:page-size="pageSize" :total="total" layout="total, sizes, prev, pager, next" @current-change="load" @size-change="page=1;load()"/></div></el-card></section></template>
+<style scoped>.page{padding:24px}.toolbar{display:flex;gap:12px}.pager{display:flex;justify-content:flex-end;margin-top:16px}</style>

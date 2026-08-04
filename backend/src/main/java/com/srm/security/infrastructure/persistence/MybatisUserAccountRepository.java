@@ -93,6 +93,7 @@ public class MybatisUserAccountRepository implements UserAccountRepository {
                 user.getPasswordHash(),
                 user.getDisplayName(),
                 user.getStatus(),
+                user.getMustChangePassword() != null && user.getMustChangePassword(),
                 users.selectActiveRoles(user.getId()),
                 users.selectEnabledPermissions(user.getId()),
                 null);

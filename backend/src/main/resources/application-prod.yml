@@ -5,6 +5,9 @@ spring:
 
 srm:
   environment: production
+  attachment:
+    root: ${SRM_ATTACHMENT_ROOT:/var/lib/srm/attachments}
+    max-file-size: 20MB
   security:
     secure-cookies: true
 

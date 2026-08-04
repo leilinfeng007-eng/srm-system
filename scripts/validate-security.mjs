@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { extname, relative, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
@@ -9,18 +9,23 @@ const excluded = ['.git', 'node_modules', 'target', 'dist']
 const binary = new Set(['.docx', '.xlsx', '.png', '.pdf', '.jar', '.class'])
 const legacyPackagePattern = new RegExp(['com', 'scm'].join('\\.'))
 const legacyMenuPattern = new RegExp(['MENU', 'SCM'].join('_'))
-const allowedEnvironmentExamples = new Set(['.env.example', 'deploy/prod.env.example'])
+const allowedEnvironmentExamples = new Set([
+  '.env.example',
+  'deploy/prod.env.example',
+  'deploy/stage1-acceptance.env.example',
+])
 
-const files = []
-const walk = (directory) => {
-  for (const name of readdirSync(directory)) {
-    if (excluded.includes(name) || name === '.DS_Store') continue
-    const path = resolve(directory, name)
-    if (statSync(path).isDirectory()) walk(path)
-    else if (!binary.has(extname(name))) files.push(path)
-  }
+const gitFiles = spawnSync('git', ['ls-files', '-co', '--exclude-standard', '-z'], {
+  cwd: root,
+  encoding: 'utf8',
+})
+if (gitFiles.status !== 0) {
+  throw new Error(`无法获取Git提交候选文件: ${gitFiles.stderr.trim()}`)
 }
-walk(root)
+const files = [...new Set(gitFiles.stdout.split('\0').filter(Boolean))]
+  .filter((name) => !name.split('/').some((part) => excluded.includes(part)))
+  .filter((name) => name !== '.DS_Store' && !binary.has(extname(name)))
+  .map((name) => resolve(root, name))
 
 for (const path of files) {
   const name = relative(root, path)
@@ -57,6 +62,7 @@ for (const forbidden of ['deploy/.env', 'deploy/.env.prod']) {
 }
 
 const productionEnv = readFileSync(resolve(root, 'deploy/prod.env.example'), 'utf8')
+const acceptanceEnv = readFileSync(resolve(root, 'deploy/stage1-acceptance.env.example'), 'utf8')
 for (const secret of [
   'SRM_DB_PASSWORD',
   'SRM_DB_ROOT_PASSWORD',
@@ -66,6 +72,9 @@ for (const secret of [
 ]) {
   if (!new RegExp(`^${secret}=$`, 'm').test(productionEnv)) {
     errors.push(`deploy/prod.env.example: ${secret}必须为空，确保样例无法直接启动`)
+  }
+  if (!new RegExp(`^${secret}=$`, 'm').test(acceptanceEnv)) {
+    errors.push(`deploy/stage1-acceptance.env.example: ${secret}必须为空，确保样例无法直接启动`)
   }
 }
 
@@ -121,4 +130,4 @@ if (errors.length) {
   process.exit(1)
 }
 
-console.log(`安全与秘密扫描通过（${files.length}个文本文件）：无私钥、访问密钥、JWT、旧包名、固定主配置密码或本地.env；部署入口可拒绝占位秘密。`)
+console.log(`安全与秘密扫描通过（${files.length}个Git提交候选文本文件）：无私钥、访问密钥、JWT、旧包名、固定主配置密码或待提交.env；部署入口可拒绝占位秘密。`)

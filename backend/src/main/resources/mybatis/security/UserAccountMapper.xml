@@ -32,4 +32,14 @@
             version = version + 1
         WHERE id = #{userId}
     </update>
+
+    <update id="updatePassword">
+        UPDATE sys_user
+        SET password_hash = #{passwordHash},
+            must_change_password = #{mustChange},
+            updated_by = #{actor},
+            updated_at = NOW(6),
+            version = version + 1
+        WHERE id = #{userId}
+    </update>
 </mapper>

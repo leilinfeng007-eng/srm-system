@@ -40,10 +40,13 @@ services:
       SRM_LOG_LEVEL: ${SRM_LOG_LEVEL:-INFO}
       SRM_SECURE_COOKIES: "true"
       SRM_OPENAPI_ENABLED: "false"
+      SRM_ATTACHMENT_ROOT: /var/lib/srm/attachments
       TZ: UTC
     depends_on:
       mysql:
         condition: service_healthy
+    volumes:
+      - srm-attachments:/var/lib/srm/attachments
     healthcheck:
       test: ["CMD", "/bin/bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /actuator/health/readiness HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"status\":\"UP\"' <&3"]
       interval: 10s
@@ -88,7 +91,7 @@ services:
       backend:
         condition: service_healthy
     ports:
-      - "${SRM_GATEWAY_PORT:?SRM_GATEWAY_PORT is required}:80"
+      - "127.0.0.1:${SRM_GATEWAY_PORT:?SRM_GATEWAY_PORT is required}:80"
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1/healthz"]
       interval: 10s
@@ -99,6 +102,8 @@ services:
 volumes:
   srm-mysql-data:
     name: ${SRM_MYSQL_VOLUME_NAME:?SRM_MYSQL_VOLUME_NAME is required}
+  srm-attachments:
+    name: ${SRM_ATTACHMENT_VOLUME_NAME:?SRM_ATTACHMENT_VOLUME_NAME is required}
 
 networks:
   srm-production:

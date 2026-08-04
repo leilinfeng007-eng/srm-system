@@ -3,7 +3,7 @@
     "securitySchemes": {}
   },
   "info": {
-    "description": "供应商端独立契约；阶段0未发布供应商业务操作。",
+    "description": "供应商端独立契约；阶段1仍未发布供应商业务操作。",
     "title": "SRM 供应商端 API",
     "version": "v1"
   },

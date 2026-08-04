@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.srm.masterdata.infrastructure.persistence.mapper.MdOrganizationMapper">
+    <resultMap id="organizationRow"
+               type="com.srm.masterdata.infrastructure.persistence.entity.MdOrganizationEntity">
+        <id property="id" column="id"/>
+        <result property="orgCode" column="org_code"/>
+        <result property="orgName" column="org_name"/>
+        <result property="orgType" column="org_type"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="path" column="path"/>
+        <result property="level" column="level"/>
+        <result property="status" column="status"/>
+        <result property="description" column="description"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedBy" column="updated_by"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="version" column="version"/>
+    </resultMap>
+
+    <select id="selectAllTree" resultMap="organizationRow">
+        SELECT id, org_code, org_name, org_type, parent_id, sort_order,
+               path, level, status, description,
+               created_by, created_at, updated_by, updated_at, version
+        FROM md_organization
+        ORDER BY sort_order, id
+    </select>
+
+    <select id="selectByParentId" resultMap="organizationRow">
+        SELECT id, org_code, org_name, org_type, parent_id, sort_order,
+               path, level, status, description,
+               created_by, created_at, updated_by, updated_at, version
+        FROM md_organization
+        WHERE parent_id = #{parentId}
+        ORDER BY sort_order, id
+    </select>
+
+    <select id="countActiveDepartments" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM sys_department
+        WHERE organization_id = #{orgId}
+          AND status = 'ACTIVE'
+    </select>
+
+    <select id="countActivePositions" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM sys_position p
+        JOIN sys_department d ON p.department_id = d.id
+        WHERE d.organization_id = #{orgId}
+          AND p.status = 'ACTIVE'
+          AND d.status = 'ACTIVE'
+    </select>
+
+    <select id="countActiveUsers" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM sys_user
+        WHERE main_organization_id = #{orgId}
+          AND status = 'ACTIVE'
+    </select>
+</mapper>

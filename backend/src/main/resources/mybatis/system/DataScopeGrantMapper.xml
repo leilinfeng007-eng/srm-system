@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.srm.system.infrastructure.persistence.mapper.DataScopeGrantMapper">
+    <select id="selectGrants"
+            resultType="com.srm.system.infrastructure.persistence.dto.DataScopeGrantRow">
+        SELECT DISTINCT r.id AS role_id,
+                        r.role_code,
+                        dp.scope_type,
+                        dp.include_children,
+                        dp.operation_mode
+        FROM sys_user_role ur
+        JOIN sys_role r ON r.id = ur.role_id
+        JOIN sys_role_permission rp ON rp.role_id = r.id
+        JOIN sys_permission permission ON permission.id = rp.permission_id
+        JOIN sys_role_data_policy dp ON dp.role_id = r.id
+        WHERE ur.user_id = #{userId}
+          AND ur.status = 'ACTIVE'
+          AND r.status = 'ACTIVE'
+          AND permission.enabled = TRUE
+          AND permission.permission_code = #{permissionCode}
+          AND dp.status = 'ACTIVE'
+          AND dp.domain_code = #{domainCode}
+          AND dp.dimension_code = #{dimensionCode}
+          <if test="writeOperation">
+              AND dp.operation_mode = 'READ_WRITE'
+          </if>
+    </select>
+</mapper>

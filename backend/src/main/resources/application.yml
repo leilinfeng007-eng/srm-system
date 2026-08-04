@@ -64,6 +64,9 @@ management:
 
 srm:
   environment: development
+  attachment:
+    root: ${SRM_ATTACHMENT_ROOT:/var/lib/srm/attachments}
+    max-file-size: 20MB
   security:
     jwt-secret: ${SRM_JWT_SECRET}
     access-token-ttl: ${SRM_ACCESS_TOKEN_TTL:PT10M}

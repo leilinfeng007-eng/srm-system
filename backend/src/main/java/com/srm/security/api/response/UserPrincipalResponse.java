@@ -7,6 +7,7 @@ public record UserPrincipalResponse(
         long userId,
         String username,
         String displayName,
+        boolean mustChangePassword,
         List<String> roles,
         List<String> permissions) {
 
@@ -15,6 +16,7 @@ public record UserPrincipalResponse(
                 principal.userId(),
                 principal.username(),
                 principal.displayName(),
+                principal.mustChangePassword(),
                 principal.roles(),
                 principal.permissions());
     }

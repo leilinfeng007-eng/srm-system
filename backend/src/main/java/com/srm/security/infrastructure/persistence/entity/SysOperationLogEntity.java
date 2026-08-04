@@ -18,6 +18,11 @@ public class SysOperationLogEntity {
     private String resultCode;
     private String traceId;
     private Instant occurredAt;
+    private String fieldChanges;
+    private String beforeHash;
+    private String afterHash;
+    private String reason;
+    private String operatorName;
 
     public Long getId() {
         return id;
@@ -82,4 +87,15 @@ public class SysOperationLogEntity {
     public void setOccurredAt(Instant occurredAt) {
         this.occurredAt = occurredAt;
     }
+
+    public String getFieldChanges() { return fieldChanges; }
+    public void setFieldChanges(String fieldChanges) { this.fieldChanges = fieldChanges; }
+    public String getBeforeHash() { return beforeHash; }
+    public void setBeforeHash(String beforeHash) { this.beforeHash = beforeHash; }
+    public String getAfterHash() { return afterHash; }
+    public void setAfterHash(String afterHash) { this.afterHash = afterHash; }
+    public String getReason() { return reason; }
+    public void setReason(String reason) { this.reason = reason; }
+    public String getOperatorName() { return operatorName; }
+    public void setOperatorName(String operatorName) { this.operatorName = operatorName; }
 }

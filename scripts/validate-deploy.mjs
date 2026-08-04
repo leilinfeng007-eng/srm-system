@@ -9,6 +9,8 @@ const productionCompose = read('deploy/docker-compose.prod.yml')
 const gateway = read('deploy/nginx/gateway/default.conf')
 const envExample = read('.env.example')
 const productionEnvExample = read('deploy/prod.env.example')
+const acceptanceEnvExample = read('deploy/stage1-acceptance.env.example')
+const releaseWorkflow = read('.github/workflows/srm-release.yml')
 const mysqlGuard = read('deploy/docker/mysql-secure-entrypoint.sh')
 const errors = []
 const check = (condition, message) => { if (!condition) errors.push(message) }
@@ -35,6 +37,7 @@ for (const secret of [
   check(productionCompose.includes(requiredExpression(secret)), `生产Compose必须强制要求秘密变量: ${secret}`)
   check(envExample.includes(`${secret}=CHANGE_ME`), `.env.example缺少CHANGE_ME占位: ${secret}`)
   check(new RegExp(`^${secret}=$`, 'm').test(productionEnvExample), `生产环境样例的${secret}必须留空`)
+  check(new RegExp(`^${secret}=$`, 'm').test(acceptanceEnvExample), `验收环境样例的${secret}必须留空`)
 }
 for (const required of [
   'SRM_BACKEND_IMAGE',
@@ -62,8 +65,14 @@ for (const repository of [
   'ccr.ccs.tencentyun.com/leizi114/srm-supplier-web',
 ]) {
   check(productionEnvExample.includes(repository), `生产环境样例缺少TCR仓库: ${repository}`)
+  check(acceptanceEnvExample.includes(repository), `验收环境样例缺少TCR仓库: ${repository}`)
 }
 check(/^SRM_IMAGE_TAG=$/m.test(productionEnvExample), '生产环境样例的SRM_IMAGE_TAG必须留空')
+check(/^SRM_IMAGE_TAG=$/m.test(acceptanceEnvExample), '验收环境样例的SRM_IMAGE_TAG必须留空')
+check(/^COMPOSE_PROJECT_NAME=srm-stage1-acceptance$/m.test(acceptanceEnvExample), '验收Compose项目名必须独立固定')
+check(/^SRM_GATEWAY_PORT=18088$/m.test(acceptanceEnvExample), '验收网关端口必须与生产默认端口隔离')
+check(/^SRM_MYSQL_VOLUME_NAME=srm-stage1-acceptance-mysql-data$/m.test(acceptanceEnvExample), '验收MySQL卷必须独立固定')
+check(/^SRM_ATTACHMENT_VOLUME_NAME=srm-stage1-acceptance-attachments$/m.test(acceptanceEnvExample), '验收附件卷必须独立固定')
 check(/SPRING_PROFILES_ACTIVE: prod/.test(productionCompose), '生产Compose必须激活prod配置')
 check(/SRM_SECURE_COOKIES: "true"/.test(productionCompose), '生产Compose必须启用Secure Cookie')
 check(/SRM_OPENAPI_ENABLED: "false"/.test(productionCompose), '生产Compose必须关闭OpenAPI')
@@ -90,11 +99,26 @@ check(read('deploy/docker/internal-web.Dockerfile').includes('node:22-alpine'), 
 check(read('deploy/docker/supplier-web.Dockerfile').includes('node:22-alpine'), '供应商端镜像必须使用Node 22构建')
 check(read('backend/Dockerfile').includes('eclipse-temurin-17'), '后端镜像必须使用JDK 17')
 
+check(/pull_request:\s*\n\s+branches:\s*\n\s+- main/m.test(releaseWorkflow), 'main的PR必须触发完整门禁')
+check(/push:\s*\n\s+branches:\s*\n\s+- main/m.test(releaseWorkflow), 'main分支push必须触发正式发布工作流')
+check(!releaseWorkflow.includes('- agent/configure-tcr-release'), '候选分支push不得直接触发镜像发布')
+check((releaseWorkflow.match(/paths-ignore:/g) ?? []).length === 2, 'PR和main push必须配置纯文档变更忽略规则')
+check((releaseWorkflow.match(/- '\*\*\/\*\.md'/g) ?? []).length === 2, 'PR和main push必须忽略纯Markdown变更')
+check(/if: github\.event_name != 'pull_request'/.test(releaseWorkflow), 'PR门禁不得构建或推送镜像')
+check((releaseWorkflow.match(/uses: docker\/build-push-action@/g) ?? []).length === 3, '工作流必须只构建三个SRM业务镜像')
+check((releaseWorkflow.match(/platforms: linux\/amd64/g) ?? []).length === 3, '三个业务镜像必须全部固定linux/amd64')
+check((releaseWorkflow.match(/push: true/g) ?? []).length === 3, '工作流必须只推送三个业务镜像')
+check(releaseWorkflow.includes('secrets.TCR_USERNAME') && releaseWorkflow.includes('secrets.TCR_PASSWORD'), 'TCR凭据必须仅引用GitHub Secrets')
+check(!releaseWorkflow.includes('TCR_PASSWORD='), '发布工作流不得写入TCR密码值')
+for (const digest of ['backend_digest', 'internal_digest', 'supplier_digest']) {
+  check(releaseWorkflow.includes(digest), `工作流摘要缺少镜像digest输出: ${digest}`)
+}
+
 if (errors.length) {
   console.error(`部署配置静态校验失败（${errors.length}项）`)
   for (const error of errors) console.error(`- ${error}`)
   process.exit(1)
 }
 
-console.log('部署配置静态校验通过：本地与生产模板均含5个服务、5个健康检查、启动依赖、MySQL 8.4、持久卷和秘密必填约束。')
+console.log('部署配置静态校验通过：本地与生产模板均含5个服务；验收项目、端口和卷独立；Actions仅构建推送3个linux/amd64业务镜像并输出digest。')
 console.log('说明：本检查不启动Docker、MySQL或Nginx，不能替代容器运行与数据卷持久化验收。')

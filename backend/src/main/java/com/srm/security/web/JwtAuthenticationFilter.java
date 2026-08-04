@@ -59,6 +59,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .filter(SrmPrincipal::isEnabled)
                     .orElseThrow(() -> new IllegalArgumentException("User is not active"))
                     .withSessionId(claims.sessionId());
+            if (principal.mustChangePassword()
+                    && !isPasswordChangeAllowed(request.getRequestURI())) {
+                errorWriter.write(response, ErrorCode.MUST_CHANGE_PASSWORD);
+                return;
+            }
             UsernamePasswordAuthenticationToken authentication =
                     UsernamePasswordAuthenticationToken.authenticated(
                             principal, null, principal.getAuthorities());
@@ -68,6 +73,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.clearContext();
             errorWriter.write(response, ErrorCode.TOKEN_INVALID);
         }
+    }
+
+    private boolean isPasswordChangeAllowed(String uri) {
+        return uri.equals("/api/v1/auth/me")
+                || uri.equals("/api/v1/auth/logout")
+                || uri.equals("/api/v1/auth/refresh")
+                || uri.equals("/api/v1/system/users/change-password");
     }
 }
 

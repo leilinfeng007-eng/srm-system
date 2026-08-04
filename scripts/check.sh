@@ -30,4 +30,4 @@ else
   echo "提示: 当前环境无 Docker，已完成本地/生产Compose静态与YAML检查，未执行Docker CLI或容器运行验收。" >&2
 fi
 
-echo "阶段0全量工程检查通过。"
+echo "阶段1全量工程检查通过（本地非Docker门禁）。"

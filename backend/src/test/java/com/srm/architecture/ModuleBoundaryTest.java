@@ -4,6 +4,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.lang.ArchRule;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
@@ -29,7 +30,9 @@ class ModuleBoundaryTest {
 
     @BeforeAll
     static void importClasses() {
-        classes = new ClassFileImporter().importPackages("com.srm");
+        classes = new ClassFileImporter()
+                .withImportOption(new ImportOption.DoNotIncludeTests())
+                .importPackages("com.srm");
     }
 
     @Test
@@ -63,6 +66,15 @@ class ModuleBoundaryTest {
     }
 
     @Test
+    void apiLayerMustNotDependOnInfrastructureDetails() {
+        noClasses()
+                .that().resideInAPackage("com.srm..api..")
+                .should().dependOnClassesThat()
+                .resideInAnyPackage("com.srm..infrastructure..", "com.baomidou.mybatisplus..")
+                .check(classes);
+    }
+
+    @Test
     void workbenchApiAndDomainMustRespectTheReferenceLayering() {
         noClasses()
                 .that().resideInAPackage("com.srm.workbench.api..")
@@ -83,14 +95,10 @@ class ModuleBoundaryTest {
     void applicationAndDomainLayersMustNotDependOnPersistenceDetails() {
         noClasses()
                 .that().resideInAnyPackage(
-                        "com.srm..api..",
                         "com.srm..application..",
                         "com.srm..domain..")
                 .should().dependOnClassesThat()
-                .resideInAnyPackage(
-                        "com.srm..infrastructure.persistence.entity..",
-                        "com.srm..infrastructure.persistence.mapper..",
-                        "com.baomidou.mybatisplus..")
+                .resideInAnyPackage("com.srm..infrastructure..", "com.baomidou.mybatisplus..")
                 .check(classes);
     }
 

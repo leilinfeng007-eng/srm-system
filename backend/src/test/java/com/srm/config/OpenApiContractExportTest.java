@@ -42,6 +42,10 @@ class OpenApiContractExportTest {
         JsonNode supplier = export("/v3/api-docs/supplier");
         assertThat(internal.path("paths").has("/api/v1/workbench/baseline")).isTrue();
         assertThat(supplier.path("paths").isEmpty()).isTrue();
+        internal.path("paths").forEach(path -> path.forEach(operation ->
+                assertThat(operation.path("summary").asText())
+                        .as("Every exported operation has a useful summary")
+                        .isNotBlank()));
 
         write(outputDirectory.resolve("internal-api.json"), internal);
         write(outputDirectory.resolve("supplier-api.json"), supplier);
