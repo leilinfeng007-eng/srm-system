@@ -18,4 +18,10 @@ public interface UserAccountMapper extends BaseMapper<SysUserEntity> {
             @Param("userId") long userId,
             @Param("loginAt") Instant loginAt,
             @Param("actor") String actor);
+
+    int updatePassword(
+            @Param("userId") long userId,
+            @Param("passwordHash") String passwordHash,
+            @Param("mustChange") boolean mustChange,
+            @Param("actor") String actor);
 }

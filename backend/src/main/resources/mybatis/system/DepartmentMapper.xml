@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.srm.system.infrastructure.persistence.mapper.DepartmentMapper">
+    <resultMap id="departmentRow"
+               type="com.srm.system.infrastructure.persistence.entity.SysDepartmentEntity">
+        <id property="id" column="id"/>
+        <result property="deptCode" column="dept_code"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="organizationId" column="organization_id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="managerName" column="manager_name"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="path" column="path"/>
+        <result property="level" column="level"/>
+        <result property="status" column="status"/>
+        <result property="description" column="description"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedBy" column="updated_by"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="version" column="version"/>
+    </resultMap>
+
+    <select id="selectByOrganizationId" resultMap="departmentRow">
+        SELECT id, dept_code, dept_name, organization_id, parent_id,
+               manager_name, sort_order, path, level, status, description,
+               created_by, created_at, updated_by, updated_at, version
+        FROM sys_department
+        WHERE organization_id = #{organizationId}
+        ORDER BY sort_order, id
+    </select>
+
+    <select id="selectByParentId" resultMap="departmentRow">
+        SELECT id, dept_code, dept_name, organization_id, parent_id,
+               manager_name, sort_order, path, level, status, description,
+               created_by, created_at, updated_by, updated_at, version
+        FROM sys_department
+        WHERE parent_id = #{parentId}
+        ORDER BY sort_order, id
+    </select>
+
+    <select id="countActivePositions" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM sys_position
+        WHERE department_id = #{deptId}
+          AND status = 'ACTIVE'
+    </select>
+
+    <select id="countActiveUsers" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM sys_user
+        WHERE main_department_id = #{deptId}
+          AND status = 'ACTIVE'
+    </select>
+</mapper>

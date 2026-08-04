@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.srm.system.infrastructure.persistence.mapper.PositionMapper">
+    <resultMap id="positionRow"
+               type="com.srm.system.infrastructure.persistence.entity.SysPositionEntity">
+        <id property="id" column="id"/>
+        <result property="positionCode" column="position_code"/>
+        <result property="positionName" column="position_name"/>
+        <result property="departmentId" column="department_id"/>
+        <result property="responsibility" column="responsibility"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="status" column="status"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedBy" column="updated_by"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="version" column="version"/>
+    </resultMap>
+
+    <select id="selectByDepartmentId" resultMap="positionRow">
+        SELECT id, position_code, position_name, department_id,
+               responsibility, sort_order, status,
+               created_by, created_at, updated_by, updated_at, version
+        FROM sys_position
+        WHERE department_id = #{departmentId}
+        ORDER BY sort_order, id
+    </select>
+
+    <select id="countActiveUsers" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM sys_user
+        WHERE main_position_id = #{positionId}
+          AND status = 'ACTIVE'
+    </select>
+</mapper>

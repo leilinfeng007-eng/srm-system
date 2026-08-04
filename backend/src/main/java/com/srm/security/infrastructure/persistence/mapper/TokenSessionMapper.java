@@ -14,4 +14,6 @@ public interface TokenSessionMapper extends BaseMapper<SysRefreshTokenEntity> {
             @Param("userId") long userId,
             @Param("accessJti") String accessJti,
             @Param("now") Instant now);
+
+    int revokeByUserId(@Param("userId") long userId, @Param("now") Instant now);
 }

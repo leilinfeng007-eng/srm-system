@@ -12,6 +12,7 @@ public record SrmPrincipal(
         String password,
         String displayName,
         String status,
+        boolean mustChangePassword,
         List<String> roles,
         List<String> permissions,
         Long sessionId) implements UserDetails {
@@ -28,6 +29,7 @@ public record SrmPrincipal(
                 password,
                 displayName,
                 status,
+                mustChangePassword,
                 roles,
                 permissions,
                 newSessionId);

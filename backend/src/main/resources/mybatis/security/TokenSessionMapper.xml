@@ -12,4 +12,11 @@
           AND revoked_at IS NULL
           AND expires_at &gt; #{now}
     </select>
+
+    <update id="revokeByUserId">
+        UPDATE sys_refresh_token
+        SET revoked_at = #{now}
+        WHERE user_id = #{userId}
+          AND revoked_at IS NULL
+    </update>
 </mapper>

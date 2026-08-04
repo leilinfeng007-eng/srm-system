@@ -16,6 +16,10 @@ springdoc:
 
 srm:
   environment: test
+  attachment:
+    root: target/test-attachments
+  sla:
+    scan-enabled: false
   security:
     jwt-secret: stage0-test-only-jwt-secret-with-more-than-32-bytes
     access-token-ttl: PT10M

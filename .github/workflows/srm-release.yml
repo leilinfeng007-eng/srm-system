@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - main
+      - agent/configure-tcr-release
   workflow_dispatch:
 
 permissions:
@@ -195,6 +196,11 @@ jobs:
       - flyway-validation
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    outputs:
+      version: ${{ steps.image-tags.outputs.version }}
+      backend_digest: ${{ steps.backend-build.outputs.digest }}
+      internal_digest: ${{ steps.internal-build.outputs.digest }}
+      supplier_digest: ${{ steps.supplier-build.outputs.digest }}
     steps:
       - name: Check out source
         uses: actions/checkout@v6
@@ -248,6 +254,7 @@ jobs:
           } >>"$GITHUB_OUTPUT"
 
       - name: Build and push backend image
+        id: backend-build
         uses: docker/build-push-action@v7
         with:
           context: ./backend
@@ -259,6 +266,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=srm-backend
 
       - name: Build and push internal web image
+        id: internal-build
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -270,6 +278,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=srm-internal-web
 
       - name: Build and push supplier web image
+        id: supplier-build
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -294,6 +303,9 @@ jobs:
           PROJECT_RESULT: ${{ needs.project-validation.result }}
           FLYWAY_RESULT: ${{ needs.flyway-validation.result }}
           PUBLISH_RESULT: ${{ needs.publish-images.result }}
+          BACKEND_DIGEST: ${{ needs.publish-images.outputs.backend_digest }}
+          INTERNAL_DIGEST: ${{ needs.publish-images.outputs.internal_digest }}
+          SUPPLIER_DIGEST: ${{ needs.publish-images.outputs.supplier_digest }}
         run: |
           short_sha="${GITHUB_SHA::12}"
           version_tag="sha-$short_sha"
@@ -312,6 +324,14 @@ jobs:
             echo "- \`$TCR_REGISTRY/$TCR_NAMESPACE/srm-backend:$version_tag\`"
             echo "- \`$TCR_REGISTRY/$TCR_NAMESPACE/srm-internal-web:$version_tag\`"
             echo "- \`$TCR_REGISTRY/$TCR_NAMESPACE/srm-supplier-web:$version_tag\`"
+            if [[ "$PUBLISH_RESULT" == 'success' ]]; then
+              echo
+              echo '## Published image digests'
+              echo
+              echo "- \`$TCR_REGISTRY/$TCR_NAMESPACE/srm-backend@$BACKEND_DIGEST\`"
+              echo "- \`$TCR_REGISTRY/$TCR_NAMESPACE/srm-internal-web@$INTERNAL_DIGEST\`"
+              echo "- \`$TCR_REGISTRY/$TCR_NAMESPACE/srm-supplier-web@$SUPPLIER_DIGEST\`"
+            fi
             if [[ "$GITHUB_REF" == 'refs/heads/main' && "$PUBLISH_RESULT" == 'success' ]]; then
               echo
               echo 'The same three repositories were also updated with the `latest` tag.'

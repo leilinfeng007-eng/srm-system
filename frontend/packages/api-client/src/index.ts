@@ -38,6 +38,19 @@ export class ApiClient {
     return this.request<T>(path, { method: 'POST', body })
   }
 
+  async download(path: string, retryAuthentication = true): Promise<Blob> {
+    const response = await this.perform(path, {})
+    if (response.status === 401 && retryAuthentication && this.options.refreshAccessToken) {
+      this.refreshPromise ??= this.options.refreshAccessToken().finally(() => {
+        this.refreshPromise = undefined
+      })
+      if (await this.refreshPromise) return this.download(path, false)
+      this.options.onAuthenticationFailure?.()
+    }
+    if (!response.ok) return this.unwrap<never>(response)
+    return response.blob()
+  }
+
   async request<T>(path: string, request: RequestOptions = {}): Promise<T> {
     const response = await this.perform(path, request)
     if (response.status === 401 && request.retryAuthentication !== false && this.options.refreshAccessToken) {
@@ -59,7 +72,10 @@ export class ApiClient {
     const token = this.options.getAccessToken?.()
     if (token) headers.set('Authorization', `Bearer ${token}`)
     let body: BodyInit | undefined
-    if (request.body !== undefined) {
+    if (request.body instanceof FormData || request.body instanceof Blob
+        || request.body instanceof URLSearchParams) {
+      body = request.body
+    } else if (request.body !== undefined) {
       headers.set('Content-Type', 'application/json')
       body = JSON.stringify(request.body)
     }

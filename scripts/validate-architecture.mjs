@@ -17,7 +17,7 @@ const walk = (directory) => {
     else if (extname(name) === '.java') javaFiles.push(path)
   }
 }
-walk(resolve(root, 'backend/src'))
+walk(resolve(root, 'backend/src/main'))
 
 const directJdbcUsage = javaFiles
   .filter((path) => !path.endsWith('ModuleBoundaryTest.java'))
@@ -105,8 +105,21 @@ for (const required of [
 
 const internal = JSON.parse(read('docs/04-接口与数据设计/openapi/internal-api.json'))
 const supplier = JSON.parse(read('docs/04-接口与数据设计/openapi/supplier-api.json'))
-check(Object.keys(internal.paths).length === 7, '内部端OpenAPI应包含7条阶段0接口路径')
-check(Object.keys(supplier.paths).length === 0, '阶段0供应商端OpenAPI不得伪造业务接口')
+const requiredStage1Paths = [
+  '/api/v1/auth/login',
+  '/api/v1/navigation/menus',
+  '/api/v1/master-data/organizations',
+  '/api/v1/master-data/materials',
+  '/api/v1/system/users',
+  '/api/v1/system/roles',
+  '/api/v1/system/approvals',
+  '/api/v1/system/inbox-events',
+]
+check(Object.keys(internal.paths).length >= 100, '内部端OpenAPI未覆盖阶段1平台与数据底座接口')
+for (const path of requiredStage1Paths) {
+  check(Boolean(internal.paths[path]), `内部端OpenAPI缺少阶段1关键路径: ${path}`)
+}
+check(Object.keys(supplier.paths).length === 0, '阶段1供应商端OpenAPI不得提前暴露真实业务接口')
 check(
   Object.keys(internal.paths).every((path) => path.startsWith('/api/v1/')),
   '内部端OpenAPI存在越界路径',

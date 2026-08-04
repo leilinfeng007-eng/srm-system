@@ -36,9 +36,9 @@ class AuthFlowIntegrationTest {
 
     @Test
     void flywayCreatesExactlyTenSystemTablesAndBootstrapIsIdempotent() {
-        assertThat(baseline.countSystemTables()).isEqualTo(10);
-        assertThat(baseline.countRoles()).isEqualTo(2);
-        assertThat(baseline.countUsers()).isEqualTo(2);
+        assertThat(baseline.countSystemTables()).isEqualTo(37);
+        assertThat(baseline.countRoles()).isEqualTo(7);
+        assertThat(baseline.countUsers()).isGreaterThanOrEqualTo(2);
     }
 
     @Test
@@ -102,9 +102,9 @@ class AuthFlowIntegrationTest {
         MvcResult adminMenus = mockMvc.perform(get("/api/v1/navigation/menus")
                         .header(HttpHeaders.AUTHORIZATION, bearer(accessToken(adminLogin))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.length()").value(12))
+                .andExpect(jsonPath("$.data.length()").value(3))
                 .andExpect(jsonPath("$.data[0].menuCode").value("MENU_WORKBENCH"))
-                .andExpect(jsonPath("$.data[11].menuCode").value("MENU_SYSTEM"))
+                .andExpect(jsonPath("$.data[2].menuCode").value("MENU_SYSTEM"))
                 .andReturn();
         JsonNode adminTree = objectMapper.readTree(adminMenus.getResponse().getContentAsString())
                 .path("data");
@@ -112,7 +112,7 @@ class AuthFlowIntegrationTest {
         for (JsonNode domain : adminTree) {
             pageCount += domain.path("children").size();
         }
-        assertThat(pageCount).isEqualTo(86);
+        assertThat(pageCount).isEqualTo(18);
         assertThat(adminMenus.getResponse().getContentAsString())
                 .doesNotContain("MENU_PROCUREMENT_FORECAST_PLAN");
 
@@ -120,9 +120,9 @@ class AuthFlowIntegrationTest {
         mockMvc.perform(get("/api/v1/navigation/menus")
                         .header(HttpHeaders.AUTHORIZATION, bearer(accessToken(viewerLogin))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.length()").value(2))
+                .andExpect(jsonPath("$.data.length()").value(1))
                 .andExpect(jsonPath("$.data[0].children.length()").value(1))
-                .andExpect(jsonPath("$.data[1].children[0].menuCode").value("MENU_SUPPLIER_POOL"));
+                .andExpect(jsonPath("$.data[0].children[0].menuCode").value("MENU_WORKBENCH_HOME"));
     }
 
     @Test

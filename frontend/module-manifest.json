@@ -32,7 +32,7 @@
       "frontendDirectory": "views/supplier",
       "sortOrder": 20,
       "phase": 2,
-      "enabled": true,
+      "enabled": false,
       "features": [
         {
           "domainCode": "supplier",
@@ -43,7 +43,7 @@
           "permission": "supplier:pool:view",
           "sortOrder": 10,
           "phase": 2,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "supplier",
@@ -54,7 +54,7 @@
           "permission": "supplier:registration:view",
           "sortOrder": 20,
           "phase": 2,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "supplier",
@@ -65,7 +65,7 @@
           "permission": "supplier:profile:view",
           "sortOrder": 30,
           "phase": 2,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "supplier",
@@ -76,7 +76,7 @@
           "permission": "supplier:admission:view",
           "sortOrder": 40,
           "phase": 2,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "supplier",
@@ -87,7 +87,7 @@
           "permission": "supplier:qualification:view",
           "sortOrder": 50,
           "phase": 2,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "supplier",
@@ -98,7 +98,7 @@
           "permission": "supplier:review-change:view",
           "sortOrder": 60,
           "phase": 2,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "supplier",
@@ -109,7 +109,7 @@
           "permission": "supplier:restriction:view",
           "sortOrder": 70,
           "phase": 2,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "supplier",
@@ -120,7 +120,7 @@
           "permission": "supplier:user:view",
           "sortOrder": 80,
           "phase": 2,
-          "enabled": true
+          "enabled": false
         }
       ]
     },
@@ -132,7 +132,7 @@
       "frontendDirectory": "views/sourcing",
       "sortOrder": 30,
       "phase": 4,
-      "enabled": true,
+      "enabled": false,
       "features": [
         {
           "domainCode": "sourcing",
@@ -143,7 +143,7 @@
           "permission": "sourcing:requirement:view",
           "sortOrder": 10,
           "phase": 4,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "sourcing",
@@ -154,7 +154,7 @@
           "permission": "sourcing:project:view",
           "sortOrder": 20,
           "phase": 4,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "sourcing",
@@ -165,7 +165,7 @@
           "permission": "sourcing:rfx:view",
           "sortOrder": 30,
           "phase": 4,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "sourcing",
@@ -176,7 +176,7 @@
           "permission": "sourcing:bid-auction:view",
           "sortOrder": 40,
           "phase": 4,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "sourcing",
@@ -187,7 +187,7 @@
           "permission": "sourcing:quotation:view",
           "sortOrder": 50,
           "phase": 4,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "sourcing",
@@ -198,7 +198,7 @@
           "permission": "sourcing:clarification:view",
           "sortOrder": 60,
           "phase": 4,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "sourcing",
@@ -209,7 +209,7 @@
           "permission": "sourcing:evaluation-award:view",
           "sortOrder": 70,
           "phase": 4,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "sourcing",
@@ -220,7 +220,7 @@
           "permission": "sourcing:conversion:view",
           "sortOrder": 80,
           "phase": 4,
-          "enabled": true
+          "enabled": false
         }
       ]
     },
@@ -232,7 +232,7 @@
       "frontendDirectory": "views/contract",
       "sortOrder": 40,
       "phase": 5,
-      "enabled": true,
+      "enabled": false,
       "features": [
         {
           "domainCode": "contract",
@@ -243,7 +243,7 @@
           "permission": "contract:contract:view",
           "sortOrder": 10,
           "phase": 5,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "contract",
@@ -254,7 +254,7 @@
           "permission": "contract:agreement:view",
           "sortOrder": 20,
           "phase": 5,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "contract",
@@ -265,7 +265,7 @@
           "permission": "contract:purchasing-basis:view",
           "sortOrder": 30,
           "phase": 5,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "contract",
@@ -276,7 +276,7 @@
           "permission": "contract:price-condition:view",
           "sortOrder": 40,
           "phase": 5,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "contract",
@@ -287,7 +287,7 @@
           "permission": "contract:price-version:view",
           "sortOrder": 50,
           "phase": 5,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "contract",
@@ -298,7 +298,7 @@
           "permission": "contract:renewal-termination:view",
           "sortOrder": 60,
           "phase": 5,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "contract",
@@ -309,7 +309,7 @@
           "permission": "contract:performance-alert:view",
           "sortOrder": 70,
           "phase": 5,
-          "enabled": true
+          "enabled": false
         }
       ]
     },
@@ -321,7 +321,7 @@
       "frontendDirectory": "views/source",
       "sortOrder": 50,
       "phase": 3,
-      "enabled": true,
+      "enabled": false,
       "features": [
         {
           "domainCode": "source",
@@ -332,7 +332,7 @@
           "permission": "source:candidate:view",
           "sortOrder": 10,
           "phase": 3,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "source",
@@ -343,7 +343,7 @@
           "permission": "source:trial-conditional:view",
           "sortOrder": 20,
           "phase": 3,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "source",
@@ -354,7 +354,7 @@
           "permission": "source:approved:view",
           "sortOrder": 30,
           "phase": 3,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "source",
@@ -365,7 +365,7 @@
           "permission": "source:quota:view",
           "sortOrder": 40,
           "phase": 3,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "source",
@@ -376,7 +376,7 @@
           "permission": "source:capacity:view",
           "sortOrder": 50,
           "phase": 3,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "source",
@@ -387,7 +387,7 @@
           "permission": "source:restriction:view",
           "sortOrder": 60,
           "phase": 3,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "source",
@@ -398,7 +398,7 @@
           "permission": "source:history:view",
           "sortOrder": 70,
           "phase": 3,
-          "enabled": true
+          "enabled": false
         }
       ]
     },
@@ -410,7 +410,7 @@
       "frontendDirectory": "views/procurement",
       "sortOrder": 60,
       "phase": 6,
-      "enabled": true,
+      "enabled": false,
       "features": [
         {
           "domainCode": "procurement",
@@ -421,7 +421,7 @@
           "permission": "procurement:requirement:view",
           "sortOrder": 10,
           "phase": 6,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "procurement",
@@ -432,7 +432,7 @@
           "permission": "procurement:matching:view",
           "sortOrder": 20,
           "phase": 6,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "procurement",
@@ -443,7 +443,7 @@
           "permission": "procurement:gap:view",
           "sortOrder": 30,
           "phase": 6,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "procurement",
@@ -454,7 +454,7 @@
           "permission": "procurement:allocation:view",
           "sortOrder": 40,
           "phase": 6,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "procurement",
@@ -465,7 +465,7 @@
           "permission": "procurement:purchase-order:view",
           "sortOrder": 50,
           "phase": 6,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "procurement",
@@ -476,7 +476,7 @@
           "permission": "procurement:confirmation:view",
           "sortOrder": 60,
           "phase": 6,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "procurement",
@@ -487,7 +487,7 @@
           "permission": "procurement:change-cancel:view",
           "sortOrder": 70,
           "phase": 6,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "procurement",
@@ -510,7 +510,7 @@
       "frontendDirectory": "views/delivery",
       "sortOrder": 70,
       "phase": 7,
-      "enabled": true,
+      "enabled": false,
       "features": [
         {
           "domainCode": "delivery",
@@ -521,7 +521,7 @@
           "permission": "delivery:plan:view",
           "sortOrder": 10,
           "phase": 7,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "delivery",
@@ -532,7 +532,7 @@
           "permission": "delivery:asn:view",
           "sortOrder": 20,
           "phase": 7,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "delivery",
@@ -543,7 +543,7 @@
           "permission": "delivery:packaging-label:view",
           "sortOrder": 30,
           "phase": 7,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "delivery",
@@ -554,7 +554,7 @@
           "permission": "delivery:shipment:view",
           "sortOrder": 40,
           "phase": 7,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "delivery",
@@ -565,7 +565,7 @@
           "permission": "delivery:appointment:view",
           "sortOrder": 50,
           "phase": 7,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "delivery",
@@ -576,7 +576,7 @@
           "permission": "delivery:receipt:view",
           "sortOrder": 60,
           "phase": 7,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "delivery",
@@ -587,7 +587,7 @@
           "permission": "delivery:quantity-difference:view",
           "sortOrder": 70,
           "phase": 7,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "delivery",
@@ -598,7 +598,7 @@
           "permission": "delivery:return:view",
           "sortOrder": 80,
           "phase": 7,
-          "enabled": true
+          "enabled": false
         }
       ]
     },
@@ -610,7 +610,7 @@
       "frontendDirectory": "views/quality",
       "sortOrder": 80,
       "phase": 8,
-      "enabled": true,
+      "enabled": false,
       "features": [
         {
           "domainCode": "quality",
@@ -621,7 +621,7 @@
           "permission": "quality:audit:view",
           "sortOrder": 10,
           "phase": 8,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "quality",
@@ -632,7 +632,7 @@
           "permission": "quality:material-qualification:view",
           "sortOrder": 20,
           "phase": 8,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "quality",
@@ -643,7 +643,7 @@
           "permission": "quality:sample-trial:view",
           "sortOrder": 30,
           "phase": 8,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "quality",
@@ -654,7 +654,7 @@
           "permission": "quality:production-approval:view",
           "sortOrder": 40,
           "phase": 8,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "quality",
@@ -665,7 +665,7 @@
           "permission": "quality:inspection:view",
           "sortOrder": 50,
           "phase": 8,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "quality",
@@ -676,7 +676,7 @@
           "permission": "quality:issue:view",
           "sortOrder": 60,
           "phase": 8,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "quality",
@@ -687,7 +687,7 @@
           "permission": "quality:scar-8d:view",
           "sortOrder": 70,
           "phase": 8,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "quality",
@@ -698,7 +698,7 @@
           "permission": "quality:rework-reinspection:view",
           "sortOrder": 80,
           "phase": 8,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "quality",
@@ -709,7 +709,7 @@
           "permission": "quality:supplier-change:view",
           "sortOrder": 90,
           "phase": 8,
-          "enabled": true
+          "enabled": false
         }
       ]
     },
@@ -721,7 +721,7 @@
       "frontendDirectory": "views/settlement",
       "sortOrder": 90,
       "phase": 9,
-      "enabled": true,
+      "enabled": false,
       "features": [
         {
           "domainCode": "settlement",
@@ -732,7 +732,7 @@
           "permission": "settlement:reconciliation:view",
           "sortOrder": 10,
           "phase": 9,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "settlement",
@@ -743,7 +743,7 @@
           "permission": "settlement:difference:view",
           "sortOrder": 20,
           "phase": 9,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "settlement",
@@ -754,7 +754,7 @@
           "permission": "settlement:invoice:view",
           "sortOrder": 30,
           "phase": 9,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "settlement",
@@ -765,7 +765,7 @@
           "permission": "settlement:payment-request:view",
           "sortOrder": 40,
           "phase": 9,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "settlement",
@@ -776,7 +776,7 @@
           "permission": "settlement:payable-status:view",
           "sortOrder": 50,
           "phase": 9,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "settlement",
@@ -787,7 +787,7 @@
           "permission": "settlement:payment-result:view",
           "sortOrder": 60,
           "phase": 9,
-          "enabled": true
+          "enabled": false
         }
       ]
     },
@@ -799,7 +799,7 @@
       "frontendDirectory": "views/performance",
       "sortOrder": 100,
       "phase": 10,
-      "enabled": true,
+      "enabled": false,
       "features": [
         {
           "domainCode": "performance",
@@ -810,7 +810,7 @@
           "permission": "performance:indicator-model:view",
           "sortOrder": 10,
           "phase": 10,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "performance",
@@ -821,7 +821,7 @@
           "permission": "performance:score:view",
           "sortOrder": 20,
           "phase": 10,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "performance",
@@ -832,7 +832,7 @@
           "permission": "performance:rating:view",
           "sortOrder": 30,
           "phase": 10,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "performance",
@@ -843,7 +843,7 @@
           "permission": "performance:risk:view",
           "sortOrder": 40,
           "phase": 10,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "performance",
@@ -854,7 +854,7 @@
           "permission": "performance:alert:view",
           "sortOrder": 50,
           "phase": 10,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "performance",
@@ -865,7 +865,7 @@
           "permission": "performance:improvement:view",
           "sortOrder": 60,
           "phase": 10,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "performance",
@@ -876,7 +876,7 @@
           "permission": "performance:supply-decision:view",
           "sortOrder": 70,
           "phase": 10,
-          "enabled": true
+          "enabled": false
         },
         {
           "domainCode": "performance",
@@ -887,7 +887,7 @@
           "permission": "performance:second-source:view",
           "sortOrder": 80,
           "phase": 10,
-          "enabled": true
+          "enabled": false
         }
       ]
     },
@@ -905,7 +905,7 @@
           "domainCode": "masterdata",
           "menuCode": "MENU_MASTERDATA_ORGANIZATION",
           "label": "企业组织",
-          "route": "/master-data/organizations",
+          "route": "/masterdata/organization",
           "componentKey": "masterdata/organization/index",
           "permission": "masterdata:organization:view",
           "sortOrder": 10,
@@ -916,7 +916,7 @@
           "domainCode": "masterdata",
           "menuCode": "MENU_MASTERDATA_PURCHASING_ORG",
           "label": "采购组织",
-          "route": "/master-data/purchasing-organizations",
+          "route": "/masterdata/purchasing-organization",
           "componentKey": "masterdata/purchasing-organization/index",
           "permission": "masterdata:purchasing-organization:view",
           "sortOrder": 20,
@@ -927,7 +927,7 @@
           "domainCode": "masterdata",
           "menuCode": "MENU_MASTERDATA_PLANT_RECEIVING",
           "label": "工厂/收货地点",
-          "route": "/master-data/plants-receiving",
+          "route": "/masterdata/plant-receiving",
           "componentKey": "masterdata/plant-receiving/index",
           "permission": "masterdata:plant-receiving:view",
           "sortOrder": 30,
@@ -938,7 +938,7 @@
           "domainCode": "masterdata",
           "menuCode": "MENU_MASTERDATA_MATERIAL",
           "label": "物料",
-          "route": "/master-data/materials",
+          "route": "/masterdata/material",
           "componentKey": "masterdata/material/index",
           "permission": "masterdata:material:view",
           "sortOrder": 40,
@@ -949,7 +949,7 @@
           "domainCode": "masterdata",
           "menuCode": "MENU_MASTERDATA_CATEGORY",
           "label": "品类",
-          "route": "/master-data/categories",
+          "route": "/masterdata/category",
           "componentKey": "masterdata/category/index",
           "permission": "masterdata:category:view",
           "sortOrder": 50,
@@ -960,7 +960,7 @@
           "domainCode": "masterdata",
           "menuCode": "MENU_MASTERDATA_UNIT_CURRENCY_TAX",
           "label": "单位/币种/税码",
-          "route": "/master-data/units-currencies-taxes",
+          "route": "/masterdata/unit-currency-tax",
           "componentKey": "masterdata/unit-currency-tax/index",
           "permission": "masterdata:unit-currency-tax:view",
           "sortOrder": 60,
@@ -971,7 +971,7 @@
           "domainCode": "masterdata",
           "menuCode": "MENU_MASTERDATA_DELIVERY_LOCATION",
           "label": "交付地点",
-          "route": "/master-data/delivery-locations",
+          "route": "/masterdata/delivery-location",
           "componentKey": "masterdata/delivery-location/index",
           "permission": "masterdata:delivery-location:view",
           "sortOrder": 70,
@@ -982,7 +982,7 @@
           "domainCode": "masterdata",
           "menuCode": "MENU_MASTERDATA_EXTERNAL_MAPPING",
           "label": "外围映射",
-          "route": "/master-data/external-mappings",
+          "route": "/masterdata/external-mapping",
           "componentKey": "masterdata/external-mapping/index",
           "permission": "masterdata:external-mapping:view",
           "sortOrder": 80,
@@ -1005,7 +1005,7 @@
           "domainCode": "system",
           "menuCode": "MENU_SYSTEM_USER",
           "label": "用户",
-          "route": "/system/users",
+          "route": "/system/user",
           "componentKey": "system/user/index",
           "permission": "system:user:view",
           "sortOrder": 10,
@@ -1016,7 +1016,7 @@
           "domainCode": "system",
           "menuCode": "MENU_SYSTEM_ROLE",
           "label": "角色与挂载用户",
-          "route": "/system/roles",
+          "route": "/system/role",
           "componentKey": "system/role/index",
           "permission": "system:role:view",
           "sortOrder": 20,
@@ -1027,7 +1027,7 @@
           "domainCode": "system",
           "menuCode": "MENU_SYSTEM_PERMISSION",
           "label": "权限与数据域",
-          "route": "/system/permissions",
+          "route": "/system/permission",
           "componentKey": "system/permission/index",
           "permission": "system:permission:view",
           "sortOrder": 30,
@@ -1038,7 +1038,7 @@
           "domainCode": "system",
           "menuCode": "MENU_SYSTEM_WORKFLOW",
           "label": "流程",
-          "route": "/system/workflows",
+          "route": "/system/workflow",
           "componentKey": "system/workflow/index",
           "permission": "system:workflow:view",
           "sortOrder": 40,
@@ -1049,7 +1049,7 @@
           "domainCode": "system",
           "menuCode": "MENU_SYSTEM_DICTIONARY_PARAMETER",
           "label": "字典参数",
-          "route": "/system/dictionaries-parameters",
+          "route": "/system/dictionary-parameter",
           "componentKey": "system/dictionary-parameter/index",
           "permission": "system:dictionary-parameter:view",
           "sortOrder": 50,
@@ -1060,7 +1060,7 @@
           "domainCode": "system",
           "menuCode": "MENU_SYSTEM_TEMPLATE_ATTACHMENT",
           "label": "模板附件",
-          "route": "/system/templates-attachments",
+          "route": "/system/template-attachment",
           "componentKey": "system/template-attachment/index",
           "permission": "system:template-attachment:view",
           "sortOrder": 60,
@@ -1071,7 +1071,7 @@
           "domainCode": "system",
           "menuCode": "MENU_SYSTEM_MESSAGE",
           "label": "消息",
-          "route": "/system/messages",
+          "route": "/system/message",
           "componentKey": "system/message/index",
           "permission": "system:message:view",
           "sortOrder": 70,
@@ -1082,7 +1082,7 @@
           "domainCode": "system",
           "menuCode": "MENU_SYSTEM_AUDIT_LOG",
           "label": "审计日志",
-          "route": "/system/audit-logs",
+          "route": "/system/audit-log",
           "componentKey": "system/audit-log/index",
           "permission": "system:audit-log:view",
           "sortOrder": 80,
@@ -1093,7 +1093,7 @@
           "domainCode": "system",
           "menuCode": "MENU_SYSTEM_INTEGRATION_JOB",
           "label": "接口与任务监控",
-          "route": "/system/integrations-jobs",
+          "route": "/system/integration-job",
           "componentKey": "system/integration-job/index",
           "permission": "system:integration-job:view",
           "sortOrder": 90,

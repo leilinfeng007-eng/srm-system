@@ -40,10 +40,13 @@ services:
       SRM_LOG_LEVEL: ${SRM_LOG_LEVEL:-INFO}
       SRM_OPENAPI_ENABLED: ${SRM_OPENAPI_ENABLED:-true}
       SRM_SECURE_COOKIES: "false"
+      SRM_ATTACHMENT_ROOT: /var/lib/srm/attachments
       TZ: UTC
     depends_on:
       mysql:
         condition: service_healthy
+    volumes:
+      - attachments-data:/var/lib/srm/attachments
     ports:
       - "127.0.0.1:${SRM_BACKEND_PORT:-8080}:8080"
     healthcheck:
@@ -101,6 +104,7 @@ services:
 
 volumes:
   mysql-data:
+  attachments-data:
 
 networks:
   srm-network:

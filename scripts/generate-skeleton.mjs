@@ -83,10 +83,8 @@ sql.push(
   "  AND p.permission_code IN ('workbench:home:view', 'supplier:pool:view');",
   '',
 )
-expected.set(
-  'backend/src/main/resources/db/migration/V3__seed_menu_permissions.sql',
-  `${sql.join('\n')}\n`,
-)
+// V3 is a released Stage-0 migration and is intentionally never regenerated.
+// Stage-1 menu visibility is advanced by later Flyway migrations.
 
 const registry = [
   '// Generated from frontend/module-manifest.json. Do not hand-edit.',
@@ -121,21 +119,8 @@ expected.set(
   `${registry.join('\n')}\n`,
 )
 
-for (const { domain, feature } of placeholderRows) {
-  const page = `<script setup lang="ts">\nimport { SkeletonFeaturePage } from '@srm/shared-ui'\n\nconst metadata = ${JSON.stringify({
-    domainLabel: domain.label,
-    featureLabel: feature.label,
-    route: feature.route,
-    permission: feature.permission,
-    menuCode: feature.menuCode,
-    phase: feature.phase,
-  }, null, 2)} as const\n</script>\n\n<template>\n  <SkeletonFeaturePage v-bind="metadata" />\n</template>\n`
-  expected.set(`frontend/apps/internal-web/src/views/${feature.componentKey}.vue`, page)
-}
-
-// The workbench home is the hand-maintained reference implementation for the full-stack
-// layering template. validate-skeleton.mjs still verifies its manifest path and route registration,
-// while this generator deliberately leaves its implementation intact.
+// Stage-1 pages are hand-maintained implementations. The generator owns only the
+// allow-listed route registry and must never replace a real page with a skeleton.
 
 const supplierRegistry = [
   '// Generated from frontend/supplier-portal-manifest.json. Do not hand-edit.',
@@ -165,29 +150,6 @@ for (const entry of supplierManifest.entries.filter((item) => item.enabled)) {
 supplierRegistry.push(']', '')
 expected.set('frontend/apps/supplier-web/src/router/route-registry.ts', `${supplierRegistry.join('\n')}\n`)
 
-const docLines = [
-  '# 阶段0模块清单说明',
-  '',
-  '机器可读唯一来源为 `frontend/module-manifest.json`，数据库种子、内部端路由注册表和页面目录由 `scripts/generate-skeleton.mjs` 生成。',
-  '',
-  `- 一级功能域：${manifest.domains.length}`,
-  `- V1.0 二级占位页：${placeholderRows.length}`,
-  '- 工作台首页：1（独立首页，不计入二级占位页）',
-  `- 阶段0可访问页面合计：${enabledRows.length}`,
-  `- 隐藏预留：${featureRows.length - enabledRows.length}（阶段7“预测与交付计划”，不生成页面或路由）`,
-  '',
-  '执行 `node scripts/generate-skeleton.mjs` 只校验生成物；架构维护者在修改清单后显式执行 `node scripts/generate-skeleton.mjs --write`。Flyway迁移进入共享分支后不得重新生成覆盖，只能新增迁移。',
-  '',
-  '| 顺序 | domainCode | 一级菜单 | 二级页数 | 后端包 |',
-  '|---:|---|---|---:|---|',
-]
-for (const domain of manifest.domains) {
-  const count = domain.domainCode === 'workbench' ? 0 : domain.features.filter((item) => item.enabled).length
-  docLines.push(`| ${domain.sortOrder / 10} | ${domain.domainCode} | ${domain.label} | ${count} | ${domain.backendPackage} |`)
-}
-docLines.push('')
-expected.set('docs/02-业务需求与功能规划/阶段0模块清单说明.md', `${docLines.join('\n')}\n`)
-
 const differences = []
 for (const [relativePath, content] of expected) {
   const target = resolve(root, relativePath)
@@ -211,5 +173,5 @@ if (differences.length && !writeMode) {
 }
 
 console.log(`${writeMode ? 'Generated' : 'Verified'} ${expected.size} files from module manifest.`)
-console.log(`12 domains=${manifest.domains.length}, placeholders=${placeholderRows.length}, enabled routes=${enabledRows.length}, hidden=${featureRows.length - enabledRows.length}`)
+console.log(`12 domains=${manifest.domains.length}, stage1 pages=${enabledRows.length}, hidden=${featureRows.length - enabledRows.length}`)
 console.log(`Supplier portal entries=${supplierManifest.entries.filter((item) => item.enabled).length}`)

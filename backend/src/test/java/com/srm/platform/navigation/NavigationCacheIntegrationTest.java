@@ -40,8 +40,8 @@ class NavigationCacheIntegrationTest {
 
         long missesBefore = nativeCache.stats().missCount();
         long hitsBefore = nativeCache.stats().hitCount();
-        assertThat(navigation.findGrantedTree(userId)).hasSize(12);
-        assertThat(navigation.findGrantedTree(userId)).hasSize(12);
+        assertThat(navigation.findGrantedTree(userId)).hasSize(3);
+        assertThat(navigation.findGrantedTree(userId)).hasSize(3);
 
         assertThat(nativeCache.stats().missCount() - missesBefore).isEqualTo(1);
         assertThat(nativeCache.stats().hitCount() - hitsBefore).isEqualTo(1);
