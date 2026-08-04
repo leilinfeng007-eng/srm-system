@@ -99,7 +99,12 @@ check(read('deploy/docker/internal-web.Dockerfile').includes('node:22-alpine'), 
 check(read('deploy/docker/supplier-web.Dockerfile').includes('node:22-alpine'), '供应商端镜像必须使用Node 22构建')
 check(read('backend/Dockerfile').includes('eclipse-temurin-17'), '后端镜像必须使用JDK 17')
 
-check(/push:\s*\n\s+branches:\s*\n\s+- main\s*\n\s+- agent\/configure-tcr-release/m.test(releaseWorkflow), '候选分支push必须触发发布工作流')
+check(/pull_request:\s*\n\s+branches:\s*\n\s+- main/m.test(releaseWorkflow), 'main的PR必须触发完整门禁')
+check(/push:\s*\n\s+branches:\s*\n\s+- main/m.test(releaseWorkflow), 'main分支push必须触发正式发布工作流')
+check(!releaseWorkflow.includes('- agent/configure-tcr-release'), '候选分支push不得直接触发镜像发布')
+check((releaseWorkflow.match(/paths-ignore:/g) ?? []).length === 2, 'PR和main push必须配置纯文档变更忽略规则')
+check((releaseWorkflow.match(/- '\*\*\/\*\.md'/g) ?? []).length === 2, 'PR和main push必须忽略纯Markdown变更')
+check(/if: github\.event_name != 'pull_request'/.test(releaseWorkflow), 'PR门禁不得构建或推送镜像')
 check((releaseWorkflow.match(/uses: docker\/build-push-action@/g) ?? []).length === 3, '工作流必须只构建三个SRM业务镜像')
 check((releaseWorkflow.match(/platforms: linux\/amd64/g) ?? []).length === 3, '三个业务镜像必须全部固定linux/amd64')
 check((releaseWorkflow.match(/push: true/g) ?? []).length === 3, '工作流必须只推送三个业务镜像')
