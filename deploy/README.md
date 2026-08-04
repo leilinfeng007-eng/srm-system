@@ -61,9 +61,10 @@ docker compose --env-file deploy/.env.prod -f deploy/docker-compose.prod.yml ps
 只能新增后续版本迁移。迁移失败会阻止后端正常启动，不得使用Flyway `repair`或手工改写
 `flyway_schema_history`绕过。
 
-阶段1服务器验收必须使用独立项目`srm-stage1-acceptance`、独立端口和独立卷，完整命令见
-[`STAGE1_ACCEPTANCE.md`](./STAGE1_ACCEPTANCE.md)。服务器验收环境从
-`stage1-acceptance.env.example`复制受限环境文件，不得复用`deploy/.env.prod`。
+阶段1源码与CI验收已通过，当前取消临时`srm-stage1-acceptance`服务器环境，不复制
+`stage1-acceptance.env.example`、不填写五项临时秘密，也不操作当前正式服务器。
+[`STAGE1_ACCEPTANCE.md`](./STAGE1_ACCEPTANCE.md)仅保留为历史安全约束和正式部署变更窗口
+参考；服务器部署、现有数据库升级、备份恢复和运行验证须在正式部署时重新评审后执行。
 
 ## 停止与数据
 
