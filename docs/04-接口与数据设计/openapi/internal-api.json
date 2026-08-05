@@ -200,6 +200,30 @@
         },
         "type": "object"
       },
+      "ApiResponseListAuthorizationRecordResponse": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/AuthorizationRecordResponse"
+            },
+            "type": "array"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ApiResponseListBatchJobError": {
         "properties": {
           "code": {
@@ -424,6 +448,30 @@
           "data": {
             "items": {
               "$ref": "#/components/schemas/RoleUserResponse"
+            },
+            "type": "array"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseListUserRoleSelectionResponse": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/UserRoleSelectionResponse"
             },
             "type": "array"
           },
@@ -861,6 +909,27 @@
         },
         "type": "object"
       },
+      "ApiResponseUserEffectivePermissionsView": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserEffectivePermissionsView"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ApiResponseUserPrincipalResponse": {
         "properties": {
           "code": {
@@ -1118,6 +1187,40 @@
             "type": "string"
           },
           "status": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AuthorizationRecordResponse": {
+        "properties": {
+          "actionCode": {
+            "type": "string"
+          },
+          "actionLabel": {
+            "type": "string"
+          },
+          "afterSummary": {
+            "type": "string"
+          },
+          "beforeSummary": {
+            "type": "string"
+          },
+          "changedBy": {
+            "type": "string"
+          },
+          "occurredAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "resultCode": {
+            "type": "string"
+          },
+          "roleId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "roleName": {
             "type": "string"
           }
         },
@@ -1473,6 +1576,13 @@
             "minLength": 0,
             "type": "string"
           },
+          "roleIds": {
+            "items": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array"
+          },
           "username": {
             "maxLength": 64,
             "minLength": 0,
@@ -1487,6 +1597,35 @@
           "password",
           "username"
         ],
+        "type": "object"
+      },
+      "DataScopePolicyView": {
+        "properties": {
+          "dimensionCode": {
+            "type": "string"
+          },
+          "domainCode": {
+            "type": "string"
+          },
+          "effective": {
+            "type": "boolean"
+          },
+          "includeChildren": {
+            "type": "boolean"
+          },
+          "ineffectiveReason": {
+            "type": "string"
+          },
+          "operationMode": {
+            "type": "string"
+          },
+          "scopeLabel": {
+            "type": "string"
+          },
+          "scopeType": {
+            "type": "string"
+          }
+        },
         "type": "object"
       },
       "DepartmentResponse": {
@@ -2486,6 +2625,21 @@
         },
         "type": "object"
       },
+      "ReplaceUserRolesRequest": {
+        "properties": {
+          "roleIds": {
+            "items": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "roleIds"
+        ],
+        "type": "object"
+      },
       "ResetPasswordResponse": {
         "properties": {
           "temporaryPassword": {
@@ -2535,6 +2689,27 @@
             "type": "string"
           },
           "scopeType": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "RoleDataScopeView": {
+        "properties": {
+          "policies": {
+            "items": {
+              "$ref": "#/components/schemas/DataScopePolicyView"
+            },
+            "type": "array"
+          },
+          "roleCode": {
+            "type": "string"
+          },
+          "roleId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "roleName": {
             "type": "string"
           }
         },
@@ -3017,6 +3192,12 @@
           "phone": {
             "type": "string"
           },
+          "roleSummaries": {
+            "items": {
+              "$ref": "#/components/schemas/UserRoleSummary"
+            },
+            "type": "array"
+          },
           "roles": {
             "items": {
               "type": "string"
@@ -3028,6 +3209,33 @@
           },
           "username": {
             "type": "string"
+          },
+          "version": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "UserEffectivePermissionItem": {
+        "properties": {
+          "actionCode": {
+            "type": "string"
+          },
+          "domainCode": {
+            "type": "string"
+          },
+          "permissionCode": {
+            "type": "string"
+          },
+          "resourceCode": {
+            "type": "string"
+          },
+          "sourceRoles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           }
         },
         "type": "object"
@@ -3043,6 +3251,48 @@
           "userId": {
             "format": "int64",
             "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "UserEffectivePermissionsView": {
+        "properties": {
+          "accessibleMenuCount": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "effectiveRoleCount": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "organizationScopeLabel": {
+            "type": "string"
+          },
+          "permissionCount": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "permissions": {
+            "items": {
+              "$ref": "#/components/schemas/UserEffectivePermissionItem"
+            },
+            "type": "array"
+          },
+          "roleScopes": {
+            "items": {
+              "$ref": "#/components/schemas/RoleDataScopeView"
+            },
+            "type": "array"
+          },
+          "status": {
+            "type": "string"
+          },
+          "userId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "username": {
+            "type": "string"
           }
         },
         "type": "object"
@@ -3127,10 +3377,62 @@
           "phone": {
             "type": "string"
           },
+          "roles": {
+            "items": {
+              "$ref": "#/components/schemas/UserRoleSummary"
+            },
+            "type": "array"
+          },
           "status": {
             "type": "string"
           },
           "username": {
+            "type": "string"
+          },
+          "version": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "UserRoleSelectionResponse": {
+        "properties": {
+          "assignable": {
+            "type": "boolean"
+          },
+          "assigned": {
+            "type": "boolean"
+          },
+          "builtIn": {
+            "type": "boolean"
+          },
+          "roleCode": {
+            "type": "string"
+          },
+          "roleId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "roleName": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "UserRoleSummary": {
+        "properties": {
+          "roleId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "roleName": {
+            "type": "string"
+          },
+          "roleStatus": {
             "type": "string"
           }
         },
@@ -8660,6 +8962,32 @@
         ]
       }
     },
+    "/api/v1/system/users/assignable-roles": {
+      "get": {
+        "operationId": "assignableRoles",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListUserRoleSelectionResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "获取当前操作人可授予的角色",
+        "tags": [
+          "user-controller"
+        ]
+      }
+    },
     "/api/v1/system/users/change-password": {
       "post": {
         "operationId": "changePassword",
@@ -8815,6 +9143,43 @@
         ]
       }
     },
+    "/api/v1/system/users/{id}/authorization-history": {
+      "get": {
+        "operationId": "authorizationHistory",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListAuthorizationRecordResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "获取用户授权变更记录",
+        "tags": [
+          "user-controller"
+        ]
+      }
+    },
     "/api/v1/system/users/{id}/disable": {
       "post": {
         "operationId": "disable",
@@ -8856,6 +9221,43 @@
           }
         ],
         "summary": "停用用户",
+        "tags": [
+          "user-controller"
+        ]
+      }
+    },
+    "/api/v1/system/users/{id}/effective-permissions": {
+      "get": {
+        "operationId": "effectivePermissions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserEffectivePermissionsView"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "获取用户生效权限与数据范围",
         "tags": [
           "user-controller"
         ]
@@ -8939,6 +9341,88 @@
           }
         ],
         "summary": "重置用户密码",
+        "tags": [
+          "user-controller"
+        ]
+      }
+    },
+    "/api/v1/system/users/{id}/roles": {
+      "get": {
+        "operationId": "roles",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListUserRoleSelectionResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "获取用户角色分配与可分配角色",
+        "tags": [
+          "user-controller"
+        ]
+      },
+      "put": {
+        "operationId": "replaceRoles",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplaceUserRolesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "批量分配用户角色",
         "tags": [
           "user-controller"
         ]

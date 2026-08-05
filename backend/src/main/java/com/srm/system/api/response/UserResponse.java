@@ -1,5 +1,6 @@
 package com.srm.system.api.response;
 
+import com.srm.system.domain.model.UserRoleSummary;
 import java.time.Instant;
 import java.util.List;
 
@@ -19,5 +20,7 @@ public record UserResponse(
         String mainPositionName,
         Instant lastLoginAt,
         Boolean mustChangePassword,
-        Instant createdAt) {
+        Instant createdAt,
+        Long version,
+        List<UserRoleSummary> roles) {
 }

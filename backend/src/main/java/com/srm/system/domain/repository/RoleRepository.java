@@ -20,6 +20,8 @@ public interface RoleRepository {
 
     long countActiveUsersExcluding(Long roleId, Long excludeUserId);
 
+    void lockActiveAssignments(Long roleId);
+
     List<Long> findUserIdsByRole(Long roleId);
 
     List<Long> findMenuIdsByRole(Long roleId);
@@ -29,6 +31,10 @@ public interface RoleRepository {
     void assignUserToRole(Long userId, Long roleId, String actor);
 
     void removeUserFromRole(Long userId, Long roleId);
+
+    List<Long> findRoleIdsByUserId(Long userId);
+
+    List<String> findPermissionCodesByRole(Long roleId);
 
     List<Role> findPage(int offset, int limit);
 

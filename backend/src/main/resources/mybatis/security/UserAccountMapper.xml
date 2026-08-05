@@ -8,6 +8,7 @@
         FROM sys_role r
         JOIN sys_user_role ur ON ur.role_id = r.id
         WHERE ur.user_id = #{userId}
+          AND ur.status = 'ACTIVE'
           AND r.status = 'ACTIVE'
         ORDER BY r.role_code
     </select>
@@ -19,6 +20,7 @@
         JOIN sys_user_role ur ON ur.role_id = rp.role_id
         JOIN sys_role r ON r.id = ur.role_id
         WHERE ur.user_id = #{userId}
+          AND ur.status = 'ACTIVE'
           AND r.status = 'ACTIVE'
           AND p.enabled = TRUE
         ORDER BY p.permission_code

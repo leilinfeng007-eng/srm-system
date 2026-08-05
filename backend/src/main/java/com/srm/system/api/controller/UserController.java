@@ -5,10 +5,14 @@ import com.srm.common.api.PageResult;
 import com.srm.system.api.request.CreateUserRequest;
 import com.srm.system.api.request.UpdateUserRequest;
 import com.srm.system.api.request.ChangePasswordRequest;
+import com.srm.system.api.request.ReplaceUserRolesRequest;
 import com.srm.system.api.response.AssignmentHistoryResponse;
+import com.srm.system.api.response.AuthorizationRecordResponse;
 import com.srm.system.api.response.ResetPasswordResponse;
 import com.srm.system.api.response.UserDetailResponse;
+import com.srm.system.api.response.UserEffectivePermissionsView;
 import com.srm.system.api.response.UserResponse;
+import com.srm.system.api.response.UserRoleSelectionResponse;
 import com.srm.system.application.service.UserApplicationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -106,6 +110,48 @@ public class UserController {
     @PreAuthorize("hasAuthority('system:user:view')")
     public ApiResponse<List<AssignmentHistoryResponse>> assignmentHistory(@PathVariable Long id) {
         return ApiResponse.success(userService.getAssignmentHistory(id));
+    }
+
+    @GetMapping("/assignable-roles")
+    @Operation(summary = "获取当前操作人可授予的角色")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasAuthority('system:user:assign-role')")
+    public ApiResponse<List<UserRoleSelectionResponse>> assignableRoles() {
+        return ApiResponse.success(userService.getAssignableRoles());
+    }
+
+    @GetMapping("/{id}/roles")
+    @Operation(summary = "获取用户角色分配与可分配角色")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasAuthority('system:user:view')")
+    public ApiResponse<List<UserRoleSelectionResponse>> roles(@PathVariable Long id) {
+        return ApiResponse.success(userService.getRoleSelection(id));
+    }
+
+    @PutMapping("/{id}/roles")
+    @Operation(summary = "批量分配用户角色")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasAuthority('system:user:assign-role')")
+    public ApiResponse<Void> replaceRoles(@PathVariable Long id,
+                                           @Valid @RequestBody ReplaceUserRolesRequest request) {
+        userService.replaceRoles(id, request.roleIds());
+        return ApiResponse.success();
+    }
+
+    @GetMapping("/{id}/authorization-history")
+    @Operation(summary = "获取用户授权变更记录")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasAuthority('system:user:view-authorization')")
+    public ApiResponse<List<AuthorizationRecordResponse>> authorizationHistory(@PathVariable Long id) {
+        return ApiResponse.success(userService.getAuthorizationHistory(id));
+    }
+
+    @GetMapping("/{id}/effective-permissions")
+    @Operation(summary = "获取用户生效权限与数据范围")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasAuthority('system:user:view-permissions')")
+    public ApiResponse<UserEffectivePermissionsView> effectivePermissions(@PathVariable Long id) {
+        return ApiResponse.success(userService.getEffectivePermissions(id));
     }
 
     @PostMapping("/change-password")

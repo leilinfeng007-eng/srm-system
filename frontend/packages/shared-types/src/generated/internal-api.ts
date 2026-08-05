@@ -1960,6 +1960,23 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/system/users/assignable-roles": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** 获取当前操作人可授予的角色 */
+        readonly get: operations["assignableRoles"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/system/users/change-password": {
         readonly parameters: {
             readonly query?: never;
@@ -2012,6 +2029,23 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/system/users/{id}/authorization-history": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** 获取用户授权变更记录 */
+        readonly get: operations["authorizationHistory"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/system/users/{id}/disable": {
         readonly parameters: {
             readonly query?: never;
@@ -2023,6 +2057,23 @@ export interface paths {
         readonly put?: never;
         /** 停用用户 */
         readonly post: operations["disable"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/system/users/{id}/effective-permissions": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** 获取用户生效权限与数据范围 */
+        readonly get: operations["effectivePermissions"];
+        readonly put?: never;
+        readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
         readonly head?: never;
@@ -2057,6 +2108,24 @@ export interface paths {
         readonly put?: never;
         /** 重置用户密码 */
         readonly post: operations["resetPassword"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/system/users/{id}/roles": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** 获取用户角色分配与可分配角色 */
+        readonly get: operations["roles"];
+        /** 批量分配用户角色 */
+        readonly put: operations["replaceRoles"];
+        readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
         readonly head?: never;
@@ -2278,6 +2347,14 @@ export interface components {
             readonly timestamp?: string;
             readonly traceId?: string;
         };
+        readonly ApiResponseListAuthorizationRecordResponse: {
+            readonly code?: string;
+            readonly data?: readonly components["schemas"]["AuthorizationRecordResponse"][];
+            readonly message?: string;
+            /** Format: date-time */
+            readonly timestamp?: string;
+            readonly traceId?: string;
+        };
         readonly ApiResponseListBatchJobError: {
             readonly code?: string;
             readonly data?: readonly components["schemas"]["BatchJobError"][];
@@ -2353,6 +2430,14 @@ export interface components {
         readonly ApiResponseListRoleUserResponse: {
             readonly code?: string;
             readonly data?: readonly components["schemas"]["RoleUserResponse"][];
+            readonly message?: string;
+            /** Format: date-time */
+            readonly timestamp?: string;
+            readonly traceId?: string;
+        };
+        readonly ApiResponseListUserRoleSelectionResponse: {
+            readonly code?: string;
+            readonly data?: readonly components["schemas"]["UserRoleSelectionResponse"][];
             readonly message?: string;
             /** Format: date-time */
             readonly timestamp?: string;
@@ -2519,6 +2604,14 @@ export interface components {
             readonly timestamp?: string;
             readonly traceId?: string;
         };
+        readonly ApiResponseUserEffectivePermissionsView: {
+            readonly code?: string;
+            readonly data?: components["schemas"]["UserEffectivePermissionsView"];
+            readonly message?: string;
+            /** Format: date-time */
+            readonly timestamp?: string;
+            readonly traceId?: string;
+        };
         readonly ApiResponseUserPrincipalResponse: {
             readonly code?: string;
             readonly data?: components["schemas"]["UserPrincipalResponse"];
@@ -2619,6 +2712,19 @@ export interface components {
             readonly ownerType?: string;
             readonly scanStatus?: string;
             readonly status?: string;
+        };
+        readonly AuthorizationRecordResponse: {
+            readonly actionCode?: string;
+            readonly actionLabel?: string;
+            readonly afterSummary?: string;
+            readonly beforeSummary?: string;
+            readonly changedBy?: string;
+            /** Format: date-time */
+            readonly occurredAt?: string;
+            readonly resultCode?: string;
+            /** Format: int64 */
+            readonly roleId?: number;
+            readonly roleName?: string;
         };
         readonly BatchExportRequest: {
             readonly idempotencyKey: string;
@@ -2728,7 +2834,18 @@ export interface components {
             readonly mainPositionId: number;
             readonly password: string;
             readonly phone?: string;
+            readonly roleIds?: readonly number[];
             readonly username: string;
+        };
+        readonly DataScopePolicyView: {
+            readonly dimensionCode?: string;
+            readonly domainCode?: string;
+            readonly effective?: boolean;
+            readonly includeChildren?: boolean;
+            readonly ineffectiveReason?: string;
+            readonly operationMode?: string;
+            readonly scopeLabel?: string;
+            readonly scopeType?: string;
         };
         readonly DepartmentResponse: {
             /** Format: date-time */
@@ -3110,6 +3227,9 @@ export interface components {
             /** Format: int64 */
             readonly version?: number;
         };
+        readonly ReplaceUserRolesRequest: {
+            readonly roleIds: readonly number[];
+        };
         readonly ResetPasswordResponse: {
             readonly temporaryPassword?: string;
         };
@@ -3126,6 +3246,13 @@ export interface components {
             readonly includeChildren?: boolean;
             readonly operationMode?: string;
             readonly scopeType?: string;
+        };
+        readonly RoleDataScopeView: {
+            readonly policies?: readonly components["schemas"]["DataScopePolicyView"][];
+            readonly roleCode?: string;
+            /** Format: int64 */
+            readonly roleId?: number;
+            readonly roleName?: string;
         };
         readonly RoleDetailResponse: {
             readonly builtIn?: boolean;
@@ -3294,14 +3421,39 @@ export interface components {
             readonly mainPositionName?: string;
             readonly mustChangePassword?: boolean;
             readonly phone?: string;
+            readonly roleSummaries?: readonly components["schemas"]["UserRoleSummary"][];
             readonly roles?: readonly string[];
             readonly status?: string;
             readonly username?: string;
+            /** Format: int64 */
+            readonly version?: number;
+        };
+        readonly UserEffectivePermissionItem: {
+            readonly actionCode?: string;
+            readonly domainCode?: string;
+            readonly permissionCode?: string;
+            readonly resourceCode?: string;
+            readonly sourceRoles?: readonly string[];
         };
         readonly UserEffectivePermissionsResponse: {
             readonly permissions?: readonly components["schemas"]["EffectivePermissionResponse"][];
             /** Format: int64 */
             readonly userId?: number;
+        };
+        readonly UserEffectivePermissionsView: {
+            /** Format: int32 */
+            readonly accessibleMenuCount?: number;
+            /** Format: int32 */
+            readonly effectiveRoleCount?: number;
+            readonly organizationScopeLabel?: string;
+            /** Format: int32 */
+            readonly permissionCount?: number;
+            readonly permissions?: readonly components["schemas"]["UserEffectivePermissionItem"][];
+            readonly roleScopes?: readonly components["schemas"]["RoleDataScopeView"][];
+            readonly status?: string;
+            /** Format: int64 */
+            readonly userId?: number;
+            readonly username?: string;
         };
         readonly UserPrincipalResponse: {
             readonly displayName?: string;
@@ -3333,8 +3485,27 @@ export interface components {
             readonly mainPositionName?: string;
             readonly mustChangePassword?: boolean;
             readonly phone?: string;
+            readonly roles?: readonly components["schemas"]["UserRoleSummary"][];
             readonly status?: string;
             readonly username?: string;
+            /** Format: int64 */
+            readonly version?: number;
+        };
+        readonly UserRoleSelectionResponse: {
+            readonly assignable?: boolean;
+            readonly assigned?: boolean;
+            readonly builtIn?: boolean;
+            readonly roleCode?: string;
+            /** Format: int64 */
+            readonly roleId?: number;
+            readonly roleName?: string;
+            readonly status?: string;
+        };
+        readonly UserRoleSummary: {
+            /** Format: int64 */
+            readonly roleId?: number;
+            readonly roleName?: string;
+            readonly roleStatus?: string;
         };
         readonly WarehouseInfo: {
             /** Format: int64 */
@@ -6807,6 +6978,26 @@ export interface operations {
             };
         };
     };
+    readonly assignableRoles: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description OK */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "*/*": components["schemas"]["ApiResponseListUserRoleSelectionResponse"];
+                };
+            };
+        };
+    };
     readonly changePassword: {
         readonly parameters: {
             readonly query?: never;
@@ -6901,6 +7092,28 @@ export interface operations {
             };
         };
     };
+    readonly authorizationHistory: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                readonly id: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description OK */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "*/*": components["schemas"]["ApiResponseListAuthorizationRecordResponse"];
+                };
+            };
+        };
+    };
     readonly disable: {
         readonly parameters: {
             readonly query?: {
@@ -6921,6 +7134,28 @@ export interface operations {
                 };
                 content: {
                     readonly "*/*": components["schemas"]["ApiResponseVoid"];
+                };
+            };
+        };
+    };
+    readonly effectivePermissions: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                readonly id: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description OK */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "*/*": components["schemas"]["ApiResponseUserEffectivePermissionsView"];
                 };
             };
         };
@@ -6967,6 +7202,54 @@ export interface operations {
                 };
                 content: {
                     readonly "*/*": components["schemas"]["ApiResponseResetPasswordResponse"];
+                };
+            };
+        };
+    };
+    readonly roles: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                readonly id: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description OK */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "*/*": components["schemas"]["ApiResponseListUserRoleSelectionResponse"];
+                };
+            };
+        };
+    };
+    readonly replaceRoles: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                readonly id: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": components["schemas"]["ReplaceUserRolesRequest"];
+            };
+        };
+        readonly responses: {
+            /** @description OK */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "*/*": components["schemas"]["ApiResponseVoid"];
                 };
             };
         };

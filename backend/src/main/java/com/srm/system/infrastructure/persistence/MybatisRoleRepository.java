@@ -2,6 +2,8 @@ package com.srm.system.infrastructure.persistence;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.srm.common.exception.BusinessException;
+import com.srm.common.exception.ErrorCode;
 import com.srm.security.infrastructure.persistence.entity.SysUserRoleEntity;
 import com.srm.security.infrastructure.persistence.mapper.UserRoleMapper;
 import com.srm.system.domain.model.Role;
@@ -20,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -94,6 +97,11 @@ public class MybatisRoleRepository implements RoleRepository {
     }
 
     @Override
+    public void lockActiveAssignments(Long roleId) {
+        roleMapper.lockActiveAssignments(roleId);
+    }
+
+    @Override
     public List<Long> findUserIdsByRole(Long roleId) {
         List<SysUserRoleEntity> assignments = userRoleMapper.selectList(
                 Wrappers.<SysUserRoleEntity>lambdaQuery()
@@ -126,18 +134,51 @@ public class MybatisRoleRepository implements RoleRepository {
     }
 
     @Override
+    public List<Long> findRoleIdsByUserId(Long userId) {
+        List<SysUserRoleEntity> assignments = userRoleMapper.selectList(
+                Wrappers.<SysUserRoleEntity>lambdaQuery()
+                        .eq(SysUserRoleEntity::getUserId, userId)
+                        .eq(SysUserRoleEntity::getStatus, "ACTIVE"));
+        if (assignments == null || assignments.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return assignments.stream().map(SysUserRoleEntity::getRoleId).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> findPermissionCodesByRole(Long roleId) {
+        return roleMapper.selectPermissionCodesByRoleId(roleId);
+    }
+
+    @Override
     public void assignUserToRole(Long userId, Long roleId, String actor) {
         SysUserRoleEntity existing = userRoleMapper.selectOne(
                 Wrappers.<SysUserRoleEntity>lambdaQuery()
                         .eq(SysUserRoleEntity::getUserId, userId)
                         .eq(SysUserRoleEntity::getRoleId, roleId));
         if (existing == null) {
-            SysUserRoleEntity assignment = new SysUserRoleEntity();
-            assignment.setUserId(userId);
-            assignment.setRoleId(roleId);
-            assignment.setStatus("ACTIVE");
-            assignment.setCreatedBy(actor);
-            userRoleMapper.insert(assignment);
+            try {
+                SysUserRoleEntity assignment = new SysUserRoleEntity();
+                assignment.setUserId(userId);
+                assignment.setRoleId(roleId);
+                assignment.setStatus("ACTIVE");
+                assignment.setCreatedBy(actor);
+                userRoleMapper.insert(assignment);
+            } catch (DuplicateKeyException concurrentInsert) {
+                SysUserRoleEntity rechecked = userRoleMapper.selectOne(
+                        Wrappers.<SysUserRoleEntity>lambdaQuery()
+                                .eq(SysUserRoleEntity::getUserId, userId)
+                                .eq(SysUserRoleEntity::getRoleId, roleId));
+                if (rechecked != null && !"ACTIVE".equals(rechecked.getStatus())) {
+                    rechecked.setStatus("ACTIVE");
+                    rechecked.setEffectiveTo(null);
+                    userRoleMapper.updateById(rechecked);
+                }
+                if (rechecked == null) {
+                    throw new BusinessException(ErrorCode.CONFLICT,
+                            "用户—角色关系正在被并发修改，请稍后重试");
+                }
+            }
         } else if (!"ACTIVE".equals(existing.getStatus())) {
             existing.setStatus("ACTIVE");
             existing.setEffectiveTo(null);

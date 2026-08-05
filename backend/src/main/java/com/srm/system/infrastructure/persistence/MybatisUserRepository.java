@@ -6,7 +6,9 @@ import com.srm.security.infrastructure.persistence.entity.SysUserEntity;
 import com.srm.security.infrastructure.persistence.mapper.TokenSessionMapper;
 import com.srm.security.infrastructure.persistence.mapper.UserAccountMapper;
 import com.srm.system.domain.model.User;
+import com.srm.system.domain.model.UserRoleSummary;
 import com.srm.system.domain.repository.UserRepository;
+import com.srm.system.infrastructure.persistence.mapper.SysUserRoleSummaryMapper;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -20,11 +22,14 @@ public class MybatisUserRepository implements UserRepository {
 
     private final UserAccountMapper userAccountMapper;
     private final TokenSessionMapper tokenSessionMapper;
+    private final SysUserRoleSummaryMapper roleSummaryMapper;
 
     public MybatisUserRepository(UserAccountMapper userAccountMapper,
-                                  TokenSessionMapper tokenSessionMapper) {
+                                  TokenSessionMapper tokenSessionMapper,
+                                  SysUserRoleSummaryMapper roleSummaryMapper) {
         this.userAccountMapper = userAccountMapper;
         this.tokenSessionMapper = tokenSessionMapper;
+        this.roleSummaryMapper = roleSummaryMapper;
     }
 
     @Override
@@ -67,8 +72,27 @@ public class MybatisUserRepository implements UserRepository {
     }
 
     @Override
+    public long countByEmployeeCode(String employeeCode) {
+        return userAccountMapper.selectCount(
+                Wrappers.<SysUserEntity>lambdaQuery().eq(SysUserEntity::getEmployeeCode, employeeCode));
+    }
+
+    @Override
+    public long countByEmployeeCodeExcluding(String employeeCode, Long excludeUserId) {
+        return userAccountMapper.selectCount(
+                Wrappers.<SysUserEntity>lambdaQuery()
+                        .eq(SysUserEntity::getEmployeeCode, employeeCode)
+                        .ne(SysUserEntity::getId, excludeUserId));
+    }
+
+    @Override
     public List<String> findActiveRoleCodes(Long userId) {
         return userAccountMapper.selectActiveRoles(userId);
+    }
+
+    @Override
+    public List<UserRoleSummary> findRoleSummaries(Long userId) {
+        return roleSummaryMapper.selectByUserId(userId);
     }
 
     @Override

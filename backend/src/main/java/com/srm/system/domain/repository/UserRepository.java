@@ -1,6 +1,7 @@
 package com.srm.system.domain.repository;
 
 import com.srm.system.domain.model.User;
+import com.srm.system.domain.model.UserRoleSummary;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +17,13 @@ public interface UserRepository {
 
     long countByUsername(String username);
 
+    long countByEmployeeCode(String employeeCode);
+
+    long countByEmployeeCodeExcluding(String employeeCode, Long excludeUserId);
+
     List<String> findActiveRoleCodes(Long userId);
+
+    List<UserRoleSummary> findRoleSummaries(Long userId);
 
     List<User> findPage(String username, String displayName, String status,
                         List<Long> allowedOrganizationIds, boolean allOrganizations,

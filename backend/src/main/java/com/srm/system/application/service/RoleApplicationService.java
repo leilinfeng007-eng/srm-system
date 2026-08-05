@@ -21,10 +21,12 @@ import com.srm.system.domain.repository.DataPolicyRequest;
 import com.srm.system.domain.repository.UserRepository;
 import com.srm.system.domain.permission.DataScopeAuthorizationService;
 import com.srm.system.domain.service.AuditRecorder;
+import com.srm.system.domain.service.RoleTransferGuard;
 import com.srm.security.auth.SrmPrincipal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -40,19 +42,22 @@ public class RoleApplicationService {
     private final AuditRecorder auditService;
     private final UserRepository userRepository;
     private final DataScopeAuthorizationService dataScope;
+    private final RoleTransferGuard roleTransferGuard;
 
     public RoleApplicationService(RoleRepository roleRepository,
                                     UserRoleHistoryRepository userRoleHistoryRepository,
                                     NavigationCacheInvalidator navigationCacheInvalidator,
                                     AuditRecorder auditService,
                                     UserRepository userRepository,
-                                    DataScopeAuthorizationService dataScope) {
+                                    DataScopeAuthorizationService dataScope,
+                                    RoleTransferGuard roleTransferGuard) {
         this.roleRepository = roleRepository;
         this.userRoleHistoryRepository = userRoleHistoryRepository;
         this.navigationCacheInvalidator = navigationCacheInvalidator;
         this.auditService = auditService;
         this.userRepository = userRepository;
         this.dataScope = dataScope;
+        this.roleTransferGuard = roleTransferGuard;
     }
 
     @Transactional(readOnly = true)
@@ -163,15 +168,18 @@ public class RoleApplicationService {
         requireAll("system:role:assign-user", true);
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "Role not found"));
+        roleTransferGuard.requireRoleEnabled(role);
         requireRoleAdministrationAllowed(role);
         String actor = currentUsername();
-        for (Long userId : userIds) {
+        boolean actorIsSuperAdmin = currentUserIsSuperAdmin();
+        Set<String> actorPermissions = currentAuthorities();
+        List<Long> distinctUserIds = userIds == null ? List.of() : userIds.stream().distinct().toList();
+        for (Long userId : distinctUserIds) {
             userRepository.findById(userId)
                     .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "User not found"));
-            if ("SUPER_ADMIN".equals(role.roleCode()) && userId.equals(currentUserId())) {
-                throw new BusinessException(ErrorCode.ACCESS_DENIED,
-                        "A user cannot grant SUPER_ADMIN to themselves");
-            }
+            roleTransferGuard.requireNotSelfAssignment(userId, currentUserId(), actorIsSuperAdmin);
+            roleTransferGuard.requireSuperAdminAdministration(role, actorIsSuperAdmin);
+            roleTransferGuard.requireTransferable(role, actorPermissions);
             roleRepository.assignUserToRole(userId, roleId, actor);
             recordUserRoleHistory(userId, roleId, "ASSIGN", null, "ACTIVE", actor);
             auditService.record("ROLE_USER_ASSIGNED", "ROLE", String.valueOf(roleId),
@@ -187,6 +195,7 @@ public class RoleApplicationService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "Role not found"));
         requireRoleAdministrationAllowed(role);
         if ("SUPER_ADMIN".equals(role.roleCode())) {
+            roleRepository.lockActiveAssignments(roleId);
             long remainingAdmins = roleRepository.countActiveUsersExcluding(roleId, userId);
             if (remainingAdmins == 0) {
                 throw new BusinessException(ErrorCode.CONFLICT, "Cannot remove the last SUPER_ADMIN user");
@@ -353,6 +362,14 @@ public class RoleApplicationService {
 
     private String currentUsername() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
+    private Set<String> currentAuthorities() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) return Collections.emptySet();
+        return auth.getAuthorities().stream()
+                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
     }
 
     private String safeIds(List<Long> values) {
