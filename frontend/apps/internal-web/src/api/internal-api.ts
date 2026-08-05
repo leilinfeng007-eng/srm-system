@@ -1,4 +1,4 @@
-import { createApiClient } from '@srm/api-client'
+import { createApiClient, randomTraceId } from '@srm/api-client'
 import type { ApiResponse, TokenResponse, WorkbenchBaseline } from '@srm/shared-types'
 import { clearAccessToken, getAccessToken, setAccessToken } from '../auth/session'
 
@@ -8,7 +8,7 @@ export const refreshInternalSession = async (): Promise<TokenResponse | undefine
   const response = await fetch(`${baseUrl}/auth/refresh`, {
     method: 'POST',
     credentials: 'include',
-    headers: { 'Accept': 'application/json', 'X-Trace-Id': crypto.randomUUID().replaceAll('-', '') },
+    headers: { 'Accept': 'application/json', 'X-Trace-Id': randomTraceId() },
   })
   if (!response.ok) {
     clearAccessToken()

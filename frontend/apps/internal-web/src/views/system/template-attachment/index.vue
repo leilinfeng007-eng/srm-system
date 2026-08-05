@@ -2,6 +2,7 @@
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox, type UploadFile } from 'element-plus'
 import { internalApi } from '../../../api/internal-api'
+import { randomTraceId } from '@srm/api-client'
 import { usePermission } from '../../../composables/usePermission'
 
 interface TemplateItem {id:number;templateCode:string;templateName:string;purpose:string|null;domainCode:string;templateVersion:number;attachmentId:number|null;status:'DRAFT'|'PUBLISHED'|'INACTIVE';createdAt:string}
@@ -30,7 +31,7 @@ async function publish(row:TemplateItem){try{await ElMessageBox.confirm('发布�
 async function disable(row:TemplateItem){try{await ElMessageBox.confirm('确认停用该模板版本？');await internalApi.post('/system/document-templates/'+row.id+'/disable');ElMessage.success('已停用');loadTemplates()}catch(e){void e}}
 function saveBlob(blob:Blob,name:string){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
 async function downloadTemplate(row:TemplateItem){try{saveBlob(await internalApi.download('/system/document-templates/'+row.id+'/download'),`${row.templateCode}-v${row.templateVersion}`)}catch(e:unknown){ElMessage.error((e as Error).message||'下载失败')}}
-function openBatch(mode:'IMPORT'|'EXPORT'){batchMode.value=mode;batchFile.value=null;Object.assign(batchForm,{objectType:'MATERIAL',idempotencyKey:crypto.randomUUID()});batchDialog.value=true}
+function openBatch(mode:'IMPORT'|'EXPORT'){batchMode.value=mode;batchFile.value=null;const trace=randomTraceId();Object.assign(batchForm,{objectType:'MATERIAL',idempotencyKey:`${trace.slice(0,8)}-${trace.slice(8,12)}-${trace.slice(12,16)}-${trace.slice(16,20)}-${trace.slice(20)}`});batchDialog.value=true}
 function selectBatchFile(file:UploadFile){batchFile.value=file.raw??null}
 async function downloadCsvTemplate(){try{saveBlob(await internalApi.download('/system/batch-jobs/import-template?objectType='+batchForm.objectType),batchForm.objectType.toLowerCase()+'-template.csv')}catch(e:unknown){ElMessage.error((e as Error).message||'模板下载失败')}}
 async function startBatch(){saving.value=true;try{if(batchMode.value==='IMPORT'){if(!batchFile.value)throw new Error('请选择 CSV 文件');const body=new FormData();body.append('objectType',batchForm.objectType);body.append('idempotencyKey',batchForm.idempotencyKey);body.append('file',batchFile.value);await internalApi.request('/system/batch-jobs/imports',{method:'POST',body})}else await internalApi.post('/system/batch-jobs/exports',batchForm);batchDialog.value=false;tab.value='jobs';ElMessage.success('任务已提交');loadJobs()}catch(e:unknown){ElMessage.error((e as Error).message||'任务提交失败')}finally{saving.value=false}}

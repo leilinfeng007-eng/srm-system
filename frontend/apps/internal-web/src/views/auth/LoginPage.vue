@@ -19,7 +19,12 @@ const submit = async () => {
     const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/workbench'
     await router.replace(redirect)
   } catch (error) {
-    errorMessage.value = error instanceof ApiError ? `${error.message}（${error.traceId ?? '无跟踪号'}）` : '登录失败，请稍后重试'
+    if (error instanceof ApiError) {
+      errorMessage.value = `${error.message}（${error.traceId ?? '无跟踪号'}）`
+    } else {
+      console.error('SRM login failed before a request reached the server', String(error instanceof Error ? error.message : error))
+      errorMessage.value = '登录失败，请稍后重试'
+    }
   } finally {
     loading.value = false
   }

@@ -1,4 +1,5 @@
 import type { ApiResponse } from '@srm/shared-types'
+import { randomTraceId } from './trace-id'
 
 export class ApiError extends Error {
   constructor(
@@ -68,7 +69,7 @@ export class ApiClient {
   private perform(path: string, request: RequestOptions): Promise<Response> {
     const headers = new Headers(request.headers)
     headers.set('Accept', 'application/json')
-    headers.set('X-Trace-Id', crypto.randomUUID().replaceAll('-', ''))
+    headers.set('X-Trace-Id', randomTraceId())
     const token = this.options.getAccessToken?.()
     if (token) headers.set('Authorization', `Bearer ${token}`)
     let body: BodyInit | undefined
@@ -108,5 +109,6 @@ export class ApiClient {
 
 export const createApiClient = (options: ApiClientOptions) => new ApiClient(options)
 
+export { randomTraceId } from './trace-id'
 export { createInternalContractClient } from './generated/internal-api-client'
 export { createSupplierContractClient } from './generated/supplier-api-client'
