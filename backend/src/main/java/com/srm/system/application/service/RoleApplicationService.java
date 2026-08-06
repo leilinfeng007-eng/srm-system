@@ -3,7 +3,7 @@ package com.srm.system.application.service;
 import com.srm.common.api.PageResult;
 import com.srm.common.exception.BusinessException;
 import com.srm.common.exception.ErrorCode;
-import com.srm.platform.navigation.NavigationCacheInvalidator;
+import com.srm.platform.navigation.TransactionAwareCacheInvalidator;
 import com.srm.system.api.request.CreateRoleRequest;
 import com.srm.system.api.request.RoleMenuPermissionRequest;
 import com.srm.system.api.request.UpdateRoleRequest;
@@ -20,6 +20,7 @@ import com.srm.system.domain.repository.UserRoleHistoryRepository;
 import com.srm.system.domain.repository.DataPolicyRequest;
 import com.srm.system.domain.repository.UserRepository;
 import com.srm.system.domain.permission.DataScopeAuthorizationService;
+import com.srm.system.domain.permission.DataScopeResolution;
 import com.srm.system.domain.service.AuditRecorder;
 import com.srm.system.domain.service.RoleTransferGuard;
 import com.srm.security.auth.SrmPrincipal;
@@ -38,7 +39,7 @@ public class RoleApplicationService {
 
     private final RoleRepository roleRepository;
     private final UserRoleHistoryRepository userRoleHistoryRepository;
-    private final NavigationCacheInvalidator navigationCacheInvalidator;
+    private final TransactionAwareCacheInvalidator navigationCacheInvalidator;
     private final AuditRecorder auditService;
     private final UserRepository userRepository;
     private final DataScopeAuthorizationService dataScope;
@@ -46,7 +47,7 @@ public class RoleApplicationService {
 
     public RoleApplicationService(RoleRepository roleRepository,
                                     UserRoleHistoryRepository userRoleHistoryRepository,
-                                    NavigationCacheInvalidator navigationCacheInvalidator,
+                                    TransactionAwareCacheInvalidator navigationCacheInvalidator,
                                     AuditRecorder auditService,
                                     UserRepository userRepository,
                                     DataScopeAuthorizationService dataScope,
@@ -69,7 +70,9 @@ public class RoleApplicationService {
         List<RoleResponse> items = roles.stream().map(r -> {
             long userCount = roleRepository.countActiveUsers(r.id());
             return new RoleResponse(r.id(), r.roleCode(), r.roleName(),
-                    r.description(), r.status(), r.builtIn(), userCount,
+                    r.description(), r.status(), r.builtIn(),
+                    r.roleCategory() != null ? r.roleCategory() : "BUSINESS",
+                    userCount,
                     r.version(), r.createdAt(), r.updatedAt());
         }).collect(Collectors.toList());
         return PageResult.of(items, page, pageSize, total);
@@ -85,13 +88,14 @@ public class RoleApplicationService {
         List<Long> permissionIds = roleRepository.findPermissionIdsByRole(id);
         List<RoleDataPolicyResponse> dataPolicies = roleRepository.findDataPolicies(id).stream()
                 .map(p -> new RoleDataPolicyResponse(p.domainCode(), p.dimensionCode(),
-                        p.scopeType(), p.includeChildren(), p.operationMode()))
+                        p.scopeType(), p.includeChildren(), p.operationMode(), p.scopeOrgIds()))
                 .toList();
         List<RoleHistoryResponse> history = findRoleHistory(id);
         return new RoleDetailResponse(role.id(), role.roleCode(), role.roleName(),
-                role.description(), role.status(), role.builtIn(), role.version(),
-                role.createdAt(), role.updatedAt(), userIds, menuIds, permissionIds,
-                dataPolicies, history);
+                role.description(), role.status(), role.builtIn(),
+                role.roleCategory() != null ? role.roleCategory() : "BUSINESS",
+                role.version(), role.createdAt(), role.updatedAt(),
+                userIds, menuIds, permissionIds, dataPolicies, history);
     }
 
     @Transactional
@@ -102,13 +106,16 @@ public class RoleApplicationService {
             throw new BusinessException(ErrorCode.CONFLICT, "Role code already exists");
         }
         Role role = new Role(null, req.roleCode(), req.roleName(), req.description(),
-                "ACTIVE", false, actor, LocalDateTime.now(), actor, LocalDateTime.now(), 0L);
+                "ACTIVE", false,
+                req.roleCategory() != null ? req.roleCategory() : "BUSINESS",
+                actor, LocalDateTime.now(), actor, LocalDateTime.now(), 0L);
         Role saved = roleRepository.save(role);
         auditService.record("ROLE_CREATED", "ROLE", String.valueOf(saved.id()), "SUCCESS",
                 null, "code=" + saved.roleCode() + ",name=" + saved.roleName(), null);
         return new RoleResponse(saved.id(), saved.roleCode(), saved.roleName(),
-                saved.description(), saved.status(), saved.builtIn(), 0L,
-                saved.version(), saved.createdAt(), saved.updatedAt());
+                saved.description(), saved.status(), saved.builtIn(),
+                saved.roleCategory() != null ? saved.roleCategory() : "BUSINESS",
+                0L, saved.version(), saved.createdAt(), saved.updatedAt());
     }
 
     @Transactional
@@ -125,6 +132,7 @@ public class RoleApplicationService {
                 req.roleName() != null ? req.roleName() : existing.roleName(),
                 req.description() != null ? req.description() : existing.description(),
                 existing.status(), existing.builtIn(),
+                req.roleCategory() != null ? req.roleCategory() : existing.roleCategory(),
                 existing.createdBy(), existing.createdAt(), currentUsername(), LocalDateTime.now(),
                 req.version() != null ? req.version() : existing.version());
         Role saved = roleRepository.update(updated);
@@ -132,8 +140,9 @@ public class RoleApplicationService {
                 "name=" + existing.roleName(), "name=" + saved.roleName(), null);
         long userCount = roleRepository.countActiveUsers(saved.id());
         return new RoleResponse(saved.id(), saved.roleCode(), saved.roleName(),
-                saved.description(), saved.status(), saved.builtIn(), userCount,
-                saved.version(), saved.createdAt(), saved.updatedAt());
+                saved.description(), saved.status(), saved.builtIn(),
+                saved.roleCategory() != null ? saved.roleCategory() : "BUSINESS",
+                userCount, saved.version(), saved.createdAt(), saved.updatedAt());
     }
 
     @Transactional
@@ -154,13 +163,26 @@ public class RoleApplicationService {
         Role existing = roleRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "Role not found"));
         if (Boolean.TRUE.equals(existing.builtIn())) {
+            auditService.record("ROLE_DISABLE_BLOCKED", "ROLE", String.valueOf(id), "FAILURE",
+                    "builtIn=" + existing.builtIn(), null, "Cannot disable built-in role");
             throw new BusinessException(ErrorCode.CONFLICT, "Cannot disable built-in role");
         }
+        long affectedUsers = roleRepository.countUsersLosingAllRoles(id);
+        if (affectedUsers > 0) {
+            auditService.record("ROLE_DISABLE_BLOCKED", "ROLE", String.valueOf(id), "FAILURE",
+                    String.valueOf(affectedUsers) + " users would lose all roles", null,
+                    "Users would be left without any active role");
+            throw new BusinessException(ErrorCode.CONFLICT,
+                    "无法停用：停用后将导致 " + affectedUsers + " 个用户失去所有有效角色，请先为这些用户重新分配角色");
+        }
         if (!roleRepository.updateStatus(id, "DISABLED", existing.version())) {
-            throw new BusinessException(ErrorCode.CONFLICT, "Concurrent modification detected");
+            auditService.record("ROLE_DISABLE_BLOCKED", "ROLE", String.valueOf(id), "FAILURE",
+                    "version=" + existing.version(), null, "Concurrent modification");
+            throw new BusinessException(ErrorCode.CONFLICT, "并发修改冲突，请刷新后重试");
         }
         auditService.record("ROLE_DISABLED", "ROLE", String.valueOf(id), "SUCCESS",
                 "status=" + existing.status(), "status=DISABLED", null);
+        navigationCacheInvalidator.evictAll();
     }
 
     @Transactional
@@ -198,8 +220,18 @@ public class RoleApplicationService {
             roleRepository.lockActiveAssignments(roleId);
             long remainingAdmins = roleRepository.countActiveUsersExcluding(roleId, userId);
             if (remainingAdmins == 0) {
+                auditService.record("ROLE_USER_REMOVE_BLOCKED", "ROLE", String.valueOf(roleId), "FAILURE",
+                        "last SUPER_ADMIN", null, "Cannot remove the last SUPER_ADMIN user");
                 throw new BusinessException(ErrorCode.CONFLICT, "Cannot remove the last SUPER_ADMIN user");
             }
+        }
+        List<Long> otherActiveRoleIds = roleRepository.findRoleIdsByUserId(userId).stream()
+                .filter(rid -> !rid.equals(roleId)).toList();
+        if (otherActiveRoleIds.isEmpty()) {
+            auditService.record("ROLE_USER_REMOVE_BLOCKED", "ROLE", String.valueOf(roleId), "FAILURE",
+                    "last role for user " + userId, null, "User would lose all roles");
+            throw new BusinessException(ErrorCode.CONFLICT,
+                    "无法移除：该角色是用户当前唯一有效角色，移除后将导致用户失去所有权限，请先为用户分配其他角色");
         }
         String actor = currentUsername();
         roleRepository.removeUserFromRole(userId, roleId);
@@ -228,7 +260,7 @@ public class RoleApplicationService {
                 roleRepository.addRolePermissions(roleId, req.permissionIds(), actor);
             }
         }
-        recordRoleHistory(roleId, "MENU_PERMISSION_UPDATED", "Assigned menus and permissions", actor);
+        recordRoleHistory(roleId, "MENU_PERM_UPDATED", "Menu/perm changed", actor);
         auditService.record("ROLE_AUTHORIZATION_UPDATED", "ROLE", String.valueOf(roleId),
                 "SUCCESS", null, "menuIds=" + safeIds(req.menuIds())
                         + ",permissionIds=" + safeIds(req.permissionIds()), null);
@@ -248,9 +280,10 @@ public class RoleApplicationService {
         List<DataPolicyRequest> domainPolicies = policies != null
                 ? policies.stream().map(p -> new DataPolicyRequest(
                         p.domainCode(), p.dimensionCode(), p.scopeType(),
-                        p.includeChildren(), p.operationMode())).collect(Collectors.toList())
+                        p.includeChildren(), p.operationMode(), p.scopeOrgIds())).collect(Collectors.toList())
                 : Collections.emptyList();
         validatePolicies(domainPolicies);
+        validateAdminScope(domainPolicies);
         roleRepository.replaceDataPolicies(roleId, domainPolicies, actor);
 
         List<DataPolicyRequest> afterPolicies = roleRepository.findDataPolicies(roleId);
@@ -258,7 +291,7 @@ public class RoleApplicationService {
                 "SUCCESS", policiesSummary(beforePolicies), policiesSummary(afterPolicies), actor);
 
         recordRoleHistory(roleId, "DATA_POLICY_UPDATED",
-                "Updated " + domainPolicies.size() + " data policies", actor);
+                "Data policies: " + domainPolicies.size(), actor);
         navigationCacheInvalidator.evictAll();
     }
 
@@ -287,6 +320,34 @@ public class RoleApplicationService {
             if ("SELF".equals(policy.scopeType()) && !"OWNER".equals(policy.dimensionCode())) {
                 throw new BusinessException(ErrorCode.VALIDATION_ERROR,
                         "SELF scope is only valid for the OWNER dimension");
+            }
+        }
+    }
+
+    private void validateAdminScope(List<DataPolicyRequest> policies) {
+        for (DataPolicyRequest policy : policies) {
+            String scopeOrgIds = policy.scopeOrgIds();
+            if (scopeOrgIds == null || scopeOrgIds.isBlank()) continue;
+            if (!"ORG".equals(policy.scopeType())) continue;
+            DataScopeResolution adminScope = dataScope.resolveForWrite(
+                    "system:role:assign-data-scope", "system", "ORGANIZATION");
+            if (!adminScope.isAllScope()) {
+                try {
+                    com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
+                    List<Long> ids = om.readValue(scopeOrgIds,
+                            new com.fasterxml.jackson.core.type.TypeReference<List<Long>>() {});
+                    for (Long orgId : ids) {
+                        if (!adminScope.coversOrganization(orgId)) {
+                            auditService.record("DATA_POLICY_SCOPE_BLOCKED", "ROLE", "scope_org_ids",
+                                    "FAILURE", null, scopeOrgIds,
+                                    "Admin scope does not cover org " + orgId);
+                            throw new BusinessException(ErrorCode.ACCESS_DENIED,
+                                    "无权配置超出自身管理范围的数据策略");
+                        }
+                    }
+                } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+                    throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Invalid scope_org_ids JSON");
+                }
             }
         }
     }
@@ -332,6 +393,8 @@ public class RoleApplicationService {
                 ? dataScope.requireWrite(permission, "system", "ORGANIZATION")
                 : dataScope.requireRead(permission, "system", "ORGANIZATION");
         if (!scope.isAllScope()) {
+            auditService.record("DATA_SCOPE_ACCESS_DENIED", "SYSTEM", permission, "FAILURE",
+                    "scope=" + scope.scopeType(), null, "Not ALL scope for " + permission);
             throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
     }
@@ -355,7 +418,7 @@ public class RoleApplicationService {
     }
 
     private void recordRoleHistory(Long roleId, String action, String description, String actor) {
-        UserRoleHistory history = new UserRoleHistory(null, 0L, roleId, action,
+        UserRoleHistory history = new UserRoleHistory(null, currentUserId(), roleId, action,
                 null, description, actor, LocalDateTime.now());
         userRoleHistoryRepository.save(history);
     }

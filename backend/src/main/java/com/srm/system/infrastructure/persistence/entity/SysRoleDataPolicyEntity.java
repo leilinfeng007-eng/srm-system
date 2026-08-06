@@ -17,6 +17,7 @@ public class SysRoleDataPolicyEntity {
     private String scopeType;
     private Boolean includeChildren;
     private String operationMode;
+    private String scopeOrgIds;
     private String status;
     private String createdBy;
     private LocalDateTime createdAt;
@@ -39,6 +40,8 @@ public class SysRoleDataPolicyEntity {
     public void setIncludeChildren(Boolean includeChildren) { this.includeChildren = includeChildren; }
     public String getOperationMode() { return operationMode; }
     public void setOperationMode(String operationMode) { this.operationMode = operationMode; }
+    public String getScopeOrgIds() { return scopeOrgIds; }
+    public void setScopeOrgIds(String scopeOrgIds) { this.scopeOrgIds = scopeOrgIds; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public String getCreatedBy() { return createdBy; }

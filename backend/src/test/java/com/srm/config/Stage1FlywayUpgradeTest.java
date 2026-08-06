@@ -31,9 +31,9 @@ class Stage1FlywayUpgradeTest {
 
         Flyway latest = Flyway.configure().dataSource(URL, "sa", "")
                 .locations("classpath:db/migration").load();
-        assertThat(latest.migrate().migrationsExecuted).isEqualTo(10);
+        assertThat(latest.migrate().migrationsExecuted).isEqualTo(11);
         assertThat(latest.info().pending()).isEmpty();
-        assertThat(latest.info().current().getVersion().getVersion()).isEqualTo("13");
+        assertThat(latest.info().current().getVersion().getVersion()).isEqualTo("14");
 
         try (var connection = DriverManager.getConnection(URL, "sa", "");
              var statement = connection.prepareStatement(

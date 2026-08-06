@@ -41,6 +41,28 @@ public class DataScopeAuthorizationService {
         return resolution;
     }
 
+    public boolean anySingleRoleCoversOrg(String permissionCode, String domainCode,
+                                           String dimensionCode, Long organizationId) {
+        List<DataScopeResolution> perRole = resolvePerRole(permissionCode, domainCode, dimensionCode, true);
+        return perRole.stream().anyMatch(r -> r.isAllScope() || r.coversOrganization(organizationId));
+    }
+
+    public boolean anySingleRoleCoversBothOrgs(String permissionCode, String domainCode,
+                                                String dimensionCode,
+                                                Long orgId1, Long orgId2) {
+        List<DataScopeResolution> perRole = resolvePerRole(permissionCode, domainCode, dimensionCode, true);
+        return perRole.stream().anyMatch(r ->
+                r.isAllScope() || (r.coversOrganization(orgId1) && r.coversOrganization(orgId2)));
+    }
+
+    private List<DataScopeResolution> resolvePerRole(String permissionCode, String domainCode,
+                                                      String dimensionCode, boolean writeOperation) {
+        SrmPrincipal principal = currentPrincipal();
+        if (principal == null) return List.of();
+        return dataScopeRepository.resolvePerRoleDataScopes(principal.userId(), permissionCode,
+                domainCode, dimensionCode, writeOperation);
+    }
+
     private DataScopeResolution resolve(String permissionCode, String domainCode,
                                         String dimensionCode, boolean writeOperation) {
         SrmPrincipal principal = currentPrincipal();

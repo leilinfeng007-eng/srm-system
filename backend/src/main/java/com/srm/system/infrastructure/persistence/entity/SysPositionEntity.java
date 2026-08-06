@@ -14,6 +14,7 @@ public class SysPositionEntity {
     private String positionCode;
     private String positionName;
     private Long departmentId;
+    private String category;
     private String responsibility;
     private Integer sortOrder;
     private String status;
@@ -32,6 +33,8 @@ public class SysPositionEntity {
     public void setPositionName(String positionName) { this.positionName = positionName; }
     public Long getDepartmentId() { return departmentId; }
     public void setDepartmentId(Long departmentId) { this.departmentId = departmentId; }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
     public String getResponsibility() { return responsibility; }
     public void setResponsibility(String responsibility) { this.responsibility = responsibility; }
     public Integer getSortOrder() { return sortOrder; }

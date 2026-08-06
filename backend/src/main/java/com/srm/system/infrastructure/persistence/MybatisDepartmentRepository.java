@@ -121,6 +121,7 @@ public class MybatisDepartmentRepository implements DepartmentRepository {
                 entity.getOrganizationId(),
                 entity.getParentId(),
                 entity.getManagerName(),
+                entity.getManagerId(),
                 entity.getSortOrder(),
                 entity.getPath(),
                 entity.getLevel(),
@@ -141,6 +142,7 @@ public class MybatisDepartmentRepository implements DepartmentRepository {
         entity.setOrganizationId(department.organizationId());
         entity.setParentId(department.parentId());
         entity.setManagerName(department.managerName());
+        entity.setManagerId(department.managerId());
         entity.setSortOrder(department.sortOrder());
         entity.setPath(department.path());
         entity.setLevel(department.level());

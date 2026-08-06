@@ -253,17 +253,17 @@ class Stage1InternalUserTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"roleIds\":[" + viewerRoleId + "," + viewerRoleId + "]}"))
                 .andExpect(status().isBadRequest());
-        mockMvc.perform(post("/api/v1/system/roles/" + viewerRoleId + "/disable")
-                        .header(HttpHeaders.AUTHORIZATION, adminToken))
+        long readAuditId = roleId("IU_READ_AUDIT");
+        mockMvc.perform(put("/api/v1/system/users/" + targetUserId + "/roles")
+                        .header(HttpHeaders.AUTHORIZATION, adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"roleIds\":[" + viewerRoleId + "," + readAuditId + "]}"))
                 .andExpect(status().isOk());
         mockMvc.perform(put("/api/v1/system/users/" + targetUserId + "/roles")
                         .header(HttpHeaders.AUTHORIZATION, adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"roleIds\":[" + viewerRoleId + "]}"))
-                .andExpect(status().isBadRequest());
-        mockMvc.perform(post("/api/v1/system/roles/" + viewerRoleId + "/enable")
-                        .header(HttpHeaders.AUTHORIZATION, adminToken))
-                .andExpect(status().isOk());
+                        .content("{\"roleIds\":[99999]}"))
+                .andExpect(status().is4xxClientError());
         mockMvc.perform(put("/api/v1/system/users/" + targetUserId + "/roles")
                         .header(HttpHeaders.AUTHORIZATION, adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -474,11 +474,12 @@ class Stage1InternalUserTest {
                         .header(HttpHeaders.AUTHORIZATION, adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"roleIds\":[]}"))
-                .andExpect(status().isOk());
-        MvcResult after = mockMvc.perform(get("/api/v1/system/users/" + plainUserId + "/authorization-history")
+                .andExpect(status().isConflict());
+        MvcResult afterRemoval = mockMvc.perform(get("/api/v1/system/users/" + plainUserId + "/roles")
                         .header(HttpHeaders.AUTHORIZATION, adminToken))
                 .andExpect(status().isOk()).andReturn();
-        assertThat(after.getResponse().getContentAsString()).contains("移除角色");
+        assertThat(afterRemoval.getResponse().getContentAsString()).contains("assigned");
+        assertThat(afterRemoval.getResponse().getContentAsString()).contains("IU_VIEWER");
 
         String auditorToken = login("iu_auditor", PASSWORD);
         mockMvc.perform(get("/api/v1/system/users/" + plainUserId + "/authorization-history")
@@ -627,16 +628,12 @@ class Stage1InternalUserTest {
                         .header(HttpHeaders.AUTHORIZATION, adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"roleIds\":[]}"))
-                .andExpect(status().isOk());
+                .andExpect(status().isConflict());
         MvcResult detail = mockMvc.perform(get("/api/v1/system/users/" + scopeUserId)
                         .header(HttpHeaders.AUTHORIZATION, adminToken))
                 .andExpect(status().isOk()).andReturn();
         assertThat(objectMapper.readTree(detail.getResponse().getContentAsString())
-                .path("data").path("status").asText()).isEqualTo("DISABLED");
-        mockMvc.perform(post("/api/v1/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"iu_scope\",\"password\":\"" + PASSWORD + "\"}"))
-                .andExpect(status().isUnauthorized());
+                .path("data").path("status").asText()).isEqualTo("ACTIVE");
     }
 
     private String login(String username, String password) throws Exception {

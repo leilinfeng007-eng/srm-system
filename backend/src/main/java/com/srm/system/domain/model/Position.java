@@ -7,6 +7,7 @@ public record Position(
         String positionCode,
         String positionName,
         Long departmentId,
+        String category,
         String responsibility,
         Integer sortOrder,
         String status,

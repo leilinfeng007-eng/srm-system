@@ -368,6 +368,11 @@ public class UserApplicationService {
                 throw new BusinessException(ErrorCode.CONFLICT, "不能移除最后一个超级管理员");
             }
         }
+        if (toAdd.isEmpty() && !toRemove.isEmpty()
+                && (current.size() - toRemove.size()) == 0) {
+            throw new BusinessException(ErrorCode.CONFLICT,
+                    "不能移除用户的所有角色，请先分配其他角色");
+        }
         for (Long roleId : toAdd) {
             Role role = roleById.get(roleId);
             roleRepository.assignUserToRole(userId, roleId, actor);

@@ -9,6 +9,7 @@ public record Role(
         String description,
         String status,
         Boolean builtIn,
+        String roleCategory,
         String createdBy,
         LocalDateTime createdAt,
         String updatedBy,

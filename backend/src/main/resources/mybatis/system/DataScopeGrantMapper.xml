@@ -9,7 +9,8 @@
                         r.role_code,
                         dp.scope_type,
                         dp.include_children,
-                        dp.operation_mode
+                        dp.operation_mode,
+                        dp.scope_org_ids
         FROM sys_user_role ur
         JOIN sys_role r ON r.id = ur.role_id
         JOIN sys_role_permission rp ON rp.role_id = r.id

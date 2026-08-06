@@ -7,5 +7,6 @@ public record RoleDataPolicyRequest(
         @NotBlank String dimensionCode,
         @NotBlank String scopeType,
         @NotBlank String operationMode,
-        boolean includeChildren) {
+        boolean includeChildren,
+        String scopeOrgIds) {
 }

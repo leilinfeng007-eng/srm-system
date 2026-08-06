@@ -615,6 +615,27 @@
         },
         "type": "object"
       },
+      "ApiResponsePageResultDepartmentResponse": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageResultDepartmentResponse"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ApiResponsePageResultInboxEvent": {
         "properties": {
           "code": {
@@ -664,6 +685,27 @@
           },
           "data": {
             "$ref": "#/components/schemas/PageResultPermissionCatalogItem"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponsePageResultPositionResponse": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageResultPositionResponse"
           },
           "message": {
             "type": "string"
@@ -1373,6 +1415,10 @@
             "minLength": 0,
             "type": "string"
           },
+          "managerId": {
+            "format": "int64",
+            "type": "integer"
+          },
           "managerName": {
             "maxLength": 100,
             "minLength": 0,
@@ -1482,6 +1528,11 @@
       },
       "CreatePositionRequest": {
         "properties": {
+          "category": {
+            "maxLength": 64,
+            "minLength": 0,
+            "type": "string"
+          },
           "departmentId": {
             "format": "int64",
             "type": "integer"
@@ -1517,6 +1568,11 @@
         "properties": {
           "description": {
             "maxLength": 255,
+            "minLength": 0,
+            "type": "string"
+          },
+          "roleCategory": {
+            "maxLength": 32,
             "minLength": 0,
             "type": "string"
           },
@@ -1651,6 +1707,10 @@
             "format": "int32",
             "type": "integer"
           },
+          "managerId": {
+            "format": "int64",
+            "type": "integer"
+          },
           "managerName": {
             "type": "string"
           },
@@ -1665,8 +1725,15 @@
             "format": "int64",
             "type": "integer"
           },
+          "parentName": {
+            "type": "string"
+          },
           "path": {
             "type": "string"
+          },
+          "positionCount": {
+            "format": "int64",
+            "type": "integer"
           },
           "sortOrder": {
             "format": "int32",
@@ -1678,6 +1745,10 @@
           "updatedAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "userCount": {
+            "format": "int64",
+            "type": "integer"
           },
           "version": {
             "format": "int64",
@@ -2331,6 +2402,33 @@
         },
         "type": "object"
       },
+      "PageResultDepartmentResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DepartmentResponse"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "pageSize": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "total": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "totalPages": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "PageResultInboxEvent": {
         "properties": {
           "items": {
@@ -2390,6 +2488,33 @@
           "items": {
             "items": {
               "$ref": "#/components/schemas/PermissionCatalogItem"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "pageSize": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "total": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "totalPages": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "PageResultPositionResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PositionResponse"
             },
             "type": "array"
           },
@@ -2583,6 +2708,9 @@
       },
       "PositionResponse": {
         "properties": {
+          "category": {
+            "type": "string"
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -2617,6 +2745,10 @@
           "updatedAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "userCount": {
+            "format": "int64",
+            "type": "integer"
           },
           "version": {
             "format": "int64",
@@ -2662,6 +2794,9 @@
           "operationMode": {
             "type": "string"
           },
+          "scopeOrgIds": {
+            "type": "string"
+          },
           "scopeType": {
             "type": "string"
           }
@@ -2686,6 +2821,9 @@
             "type": "boolean"
           },
           "operationMode": {
+            "type": "string"
+          },
+          "scopeOrgIds": {
             "type": "string"
           },
           "scopeType": {
@@ -2756,6 +2894,9 @@
               "type": "integer"
             },
             "type": "array"
+          },
+          "roleCategory": {
+            "type": "string"
           },
           "roleCode": {
             "type": "string"
@@ -2840,6 +2981,9 @@
           "id": {
             "format": "int64",
             "type": "integer"
+          },
+          "roleCategory": {
+            "type": "string"
           },
           "roleCode": {
             "type": "string"
@@ -2968,6 +3112,10 @@
             "minLength": 0,
             "type": "string"
           },
+          "managerId": {
+            "format": "int64",
+            "type": "integer"
+          },
           "managerName": {
             "maxLength": 100,
             "minLength": 0,
@@ -3051,6 +3199,11 @@
       },
       "UpdatePositionRequest": {
         "properties": {
+          "category": {
+            "maxLength": 64,
+            "minLength": 0,
+            "type": "string"
+          },
           "departmentId": {
             "format": "int64",
             "type": "integer"
@@ -3080,6 +3233,11 @@
         "properties": {
           "description": {
             "maxLength": 255,
+            "minLength": 0,
+            "type": "string"
+          },
+          "roleCategory": {
+            "maxLength": 32,
             "minLength": 0,
             "type": "string"
           },
@@ -5723,7 +5881,7 @@
     },
     "/api/v1/system/approvals": {
       "get": {
-        "operationId": "list_9",
+        "operationId": "list_11",
         "parameters": [
           {
             "in": "query",
@@ -6230,7 +6388,7 @@
     },
     "/api/v1/system/audit-logs": {
       "get": {
-        "operationId": "list_8",
+        "operationId": "list_10",
         "parameters": [
           {
             "in": "query",
@@ -6294,7 +6452,7 @@
     },
     "/api/v1/system/batch-jobs": {
       "get": {
-        "operationId": "list_7",
+        "operationId": "list_9",
         "parameters": [
           {
             "in": "query",
@@ -6551,14 +6709,58 @@
     },
     "/api/v1/system/departments": {
       "get": {
-        "operationId": "listByOrganization",
+        "operationId": "list_8",
         "parameters": [
           {
             "in": "query",
+            "name": "deptCode",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deptName",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
             "name": "organizationId",
-            "required": true,
+            "required": false,
             "schema": {
               "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "format": "int32",
               "type": "integer"
             }
           }
@@ -6568,7 +6770,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiResponseListDepartmentResponse"
+                  "$ref": "#/components/schemas/ApiResponsePageResultDepartmentResponse"
                 }
               }
             },
@@ -6580,7 +6782,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "按组织查询部门列表",
+        "summary": "分页查询部门列表",
         "tags": [
           "department-controller"
         ]
@@ -6615,6 +6817,43 @@
           }
         ],
         "summary": "创建部门",
+        "tags": [
+          "department-controller"
+        ]
+      }
+    },
+    "/api/v1/system/departments/tree": {
+      "get": {
+        "operationId": "tree",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "organizationId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListDepartmentResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "按组织查询部门树",
         "tags": [
           "department-controller"
         ]
@@ -6778,7 +7017,7 @@
     },
     "/api/v1/system/dictionaries": {
       "get": {
-        "operationId": "list_6",
+        "operationId": "list_7",
         "responses": {
           "200": {
             "content": {
@@ -7169,7 +7408,7 @@
     },
     "/api/v1/system/document-templates": {
       "get": {
-        "operationId": "list_5",
+        "operationId": "list_6",
         "parameters": [
           {
             "in": "query",
@@ -7553,7 +7792,7 @@
     },
     "/api/v1/system/number-rules": {
       "get": {
-        "operationId": "list_4",
+        "operationId": "list_5",
         "responses": {
           "200": {
             "content": {
@@ -7861,7 +8100,7 @@
     },
     "/api/v1/system/parameters": {
       "get": {
-        "operationId": "list_3",
+        "operationId": "list_4",
         "responses": {
           "200": {
             "content": {
@@ -8131,14 +8370,66 @@
     },
     "/api/v1/system/positions": {
       "get": {
-        "operationId": "listByDepartment",
+        "operationId": "list_3",
         "parameters": [
           {
             "in": "query",
+            "name": "positionCode",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "positionName",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
             "name": "departmentId",
-            "required": true,
+            "required": false,
             "schema": {
               "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "format": "int32",
               "type": "integer"
             }
           }
@@ -8148,7 +8439,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiResponseListPositionResponse"
+                  "$ref": "#/components/schemas/ApiResponsePageResultPositionResponse"
                 }
               }
             },
@@ -8160,7 +8451,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "按部门查询岗位列表",
+        "summary": "分页查询岗位列表",
         "tags": [
           "position-controller"
         ]
@@ -8195,6 +8486,43 @@
           }
         ],
         "summary": "创建岗位",
+        "tags": [
+          "position-controller"
+        ]
+      }
+    },
+    "/api/v1/system/positions/by-department": {
+      "get": {
+        "operationId": "listByDepartment",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "departmentId",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListPositionResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "按部门查询岗位列表",
         "tags": [
           "position-controller"
         ]

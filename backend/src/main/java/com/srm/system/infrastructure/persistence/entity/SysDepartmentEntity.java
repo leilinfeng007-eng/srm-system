@@ -16,6 +16,7 @@ public class SysDepartmentEntity {
     private Long organizationId;
     private Long parentId;
     private String managerName;
+    private Long managerId;
     private Integer sortOrder;
     private String path;
     private Integer level;
@@ -40,6 +41,8 @@ public class SysDepartmentEntity {
     public void setParentId(Long parentId) { this.parentId = parentId; }
     public String getManagerName() { return managerName; }
     public void setManagerName(String managerName) { this.managerName = managerName; }
+    public Long getManagerId() { return managerId; }
+    public void setManagerId(Long managerId) { this.managerId = managerId; }
     public Integer getSortOrder() { return sortOrder; }
     public void setSortOrder(Integer sortOrder) { this.sortOrder = sortOrder; }
     public String getPath() { return path; }

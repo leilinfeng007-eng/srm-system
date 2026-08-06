@@ -794,7 +794,7 @@ export interface paths {
             readonly cookie?: never;
         };
         /** 我发起的审批分页 */
-        readonly get: operations["list_9"];
+        readonly get: operations["list_11"];
         readonly put?: never;
         readonly post?: never;
         readonly delete?: never;
@@ -999,7 +999,7 @@ export interface paths {
             readonly cookie?: never;
         };
         /** 审计日志分页查询 */
-        readonly get: operations["list_8"];
+        readonly get: operations["list_10"];
         readonly put?: never;
         readonly post?: never;
         readonly delete?: never;
@@ -1016,7 +1016,7 @@ export interface paths {
             readonly cookie?: never;
         };
         /** List batch job */
-        readonly get: operations["list_7"];
+        readonly get: operations["list_9"];
         readonly put?: never;
         readonly post?: never;
         readonly delete?: never;
@@ -1134,11 +1134,28 @@ export interface paths {
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** 按组织查询部门列表 */
-        readonly get: operations["listByOrganization"];
+        /** 分页查询部门列表 */
+        readonly get: operations["list_8"];
         readonly put?: never;
         /** 创建部门 */
         readonly post: operations["create_8"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/system/departments/tree": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** 按组织查询部门树 */
+        readonly get: operations["tree"];
+        readonly put?: never;
+        readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
         readonly head?: never;
@@ -1205,7 +1222,7 @@ export interface paths {
             readonly cookie?: never;
         };
         /** List dictionary */
-        readonly get: operations["list_6"];
+        readonly get: operations["list_7"];
         readonly put?: never;
         /** Create dictionary */
         readonly post: operations["create_7"];
@@ -1344,7 +1361,7 @@ export interface paths {
             readonly cookie?: never;
         };
         /** List document template */
-        readonly get: operations["list_5"];
+        readonly get: operations["list_6"];
         readonly put?: never;
         /** Create document template */
         readonly post: operations["create_6"];
@@ -1499,7 +1516,7 @@ export interface paths {
             readonly cookie?: never;
         };
         /** List number rule */
-        readonly get: operations["list_4"];
+        readonly get: operations["list_5"];
         readonly put?: never;
         /** Create number rule */
         readonly post: operations["create_5"];
@@ -1620,7 +1637,7 @@ export interface paths {
             readonly cookie?: never;
         };
         /** List parameter */
-        readonly get: operations["list_3"];
+        readonly get: operations["list_4"];
         readonly put?: never;
         /** Create parameter */
         readonly post: operations["create_4"];
@@ -1723,11 +1740,28 @@ export interface paths {
             readonly path?: never;
             readonly cookie?: never;
         };
-        /** 按部门查询岗位列表 */
-        readonly get: operations["listByDepartment"];
+        /** 分页查询岗位列表 */
+        readonly get: operations["list_3"];
         readonly put?: never;
         /** 创建岗位 */
         readonly post: operations["create_3"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/system/positions/by-department": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** 按部门查询岗位列表 */
+        readonly get: operations["listByDepartment"];
+        readonly put?: never;
+        readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
         readonly head?: never;
@@ -2492,6 +2526,14 @@ export interface components {
             readonly timestamp?: string;
             readonly traceId?: string;
         };
+        readonly ApiResponsePageResultDepartmentResponse: {
+            readonly code?: string;
+            readonly data?: components["schemas"]["PageResultDepartmentResponse"];
+            readonly message?: string;
+            /** Format: date-time */
+            readonly timestamp?: string;
+            readonly traceId?: string;
+        };
         readonly ApiResponsePageResultInboxEvent: {
             readonly code?: string;
             readonly data?: components["schemas"]["PageResultInboxEvent"];
@@ -2511,6 +2553,14 @@ export interface components {
         readonly ApiResponsePageResultPermissionCatalogItem: {
             readonly code?: string;
             readonly data?: components["schemas"]["PageResultPermissionCatalogItem"];
+            readonly message?: string;
+            /** Format: date-time */
+            readonly timestamp?: string;
+            readonly traceId?: string;
+        };
+        readonly ApiResponsePageResultPositionResponse: {
+            readonly code?: string;
+            readonly data?: components["schemas"]["PageResultPositionResponse"];
             readonly message?: string;
             /** Format: date-time */
             readonly timestamp?: string;
@@ -2780,6 +2830,8 @@ export interface components {
             readonly deptCode: string;
             readonly deptName: string;
             readonly description?: string;
+            /** Format: int64 */
+            readonly managerId?: number;
             readonly managerName?: string;
             /** Format: int64 */
             readonly organizationId: number;
@@ -2809,6 +2861,7 @@ export interface components {
             readonly warehouseType?: string;
         };
         readonly CreatePositionRequest: {
+            readonly category?: string;
             /** Format: int64 */
             readonly departmentId: number;
             readonly positionCode: string;
@@ -2819,6 +2872,7 @@ export interface components {
         };
         readonly CreateRoleRequest: {
             readonly description?: string;
+            readonly roleCategory?: string;
             readonly roleCode: string;
             readonly roleName: string;
         };
@@ -2857,18 +2911,25 @@ export interface components {
             readonly id?: number;
             /** Format: int32 */
             readonly level?: number;
+            /** Format: int64 */
+            readonly managerId?: number;
             readonly managerName?: string;
             /** Format: int64 */
             readonly organizationId?: number;
             readonly organizationName?: string;
             /** Format: int64 */
             readonly parentId?: number;
+            readonly parentName?: string;
             readonly path?: string;
+            /** Format: int64 */
+            readonly positionCount?: number;
             /** Format: int32 */
             readonly sortOrder?: number;
             readonly status?: string;
             /** Format: date-time */
             readonly updatedAt?: string;
+            /** Format: int64 */
+            readonly userCount?: number;
             /** Format: int64 */
             readonly version?: number;
         };
@@ -3111,6 +3172,17 @@ export interface components {
             /** Format: int64 */
             readonly totalPages?: number;
         };
+        readonly PageResultDepartmentResponse: {
+            readonly items?: readonly components["schemas"]["DepartmentResponse"][];
+            /** Format: int32 */
+            readonly page?: number;
+            /** Format: int32 */
+            readonly pageSize?: number;
+            /** Format: int64 */
+            readonly total?: number;
+            /** Format: int64 */
+            readonly totalPages?: number;
+        };
         readonly PageResultInboxEvent: {
             readonly items?: readonly components["schemas"]["InboxEvent"][];
             /** Format: int32 */
@@ -3135,6 +3207,17 @@ export interface components {
         };
         readonly PageResultPermissionCatalogItem: {
             readonly items?: readonly components["schemas"]["PermissionCatalogItem"][];
+            /** Format: int32 */
+            readonly page?: number;
+            /** Format: int32 */
+            readonly pageSize?: number;
+            /** Format: int64 */
+            readonly total?: number;
+            /** Format: int64 */
+            readonly totalPages?: number;
+        };
+        readonly PageResultPositionResponse: {
+            readonly items?: readonly components["schemas"]["PositionResponse"][];
             /** Format: int32 */
             readonly page?: number;
             /** Format: int32 */
@@ -3209,6 +3292,7 @@ export interface components {
             readonly timezone?: string;
         };
         readonly PositionResponse: {
+            readonly category?: string;
             /** Format: date-time */
             readonly createdAt?: string;
             /** Format: int64 */
@@ -3225,6 +3309,8 @@ export interface components {
             /** Format: date-time */
             readonly updatedAt?: string;
             /** Format: int64 */
+            readonly userCount?: number;
+            /** Format: int64 */
             readonly version?: number;
         };
         readonly ReplaceUserRolesRequest: {
@@ -3238,6 +3324,7 @@ export interface components {
             readonly domainCode: string;
             readonly includeChildren?: boolean;
             readonly operationMode: string;
+            readonly scopeOrgIds?: string;
             readonly scopeType: string;
         };
         readonly RoleDataPolicyResponse: {
@@ -3245,6 +3332,7 @@ export interface components {
             readonly domainCode?: string;
             readonly includeChildren?: boolean;
             readonly operationMode?: string;
+            readonly scopeOrgIds?: string;
             readonly scopeType?: string;
         };
         readonly RoleDataScopeView: {
@@ -3265,6 +3353,7 @@ export interface components {
             readonly id?: number;
             readonly menuIds?: readonly number[];
             readonly permissionIds?: readonly number[];
+            readonly roleCategory?: string;
             readonly roleCode?: string;
             readonly roleName?: string;
             readonly status?: string;
@@ -3294,6 +3383,7 @@ export interface components {
             readonly description?: string;
             /** Format: int64 */
             readonly id?: number;
+            readonly roleCategory?: string;
             readonly roleCode?: string;
             readonly roleName?: string;
             readonly status?: string;
@@ -3343,6 +3433,8 @@ export interface components {
         readonly UpdateDepartmentRequest: {
             readonly deptName?: string;
             readonly description?: string;
+            /** Format: int64 */
+            readonly managerId?: number;
             readonly managerName?: string;
             /** Format: int64 */
             readonly organizationId?: number;
@@ -3370,6 +3462,7 @@ export interface components {
             readonly warehouseType?: string;
         };
         readonly UpdatePositionRequest: {
+            readonly category?: string;
             /** Format: int64 */
             readonly departmentId?: number;
             readonly positionName?: string;
@@ -3381,6 +3474,7 @@ export interface components {
         };
         readonly UpdateRoleRequest: {
             readonly description?: string;
+            readonly roleCategory?: string;
             readonly roleName?: string;
             /** Format: int64 */
             readonly version?: number;
@@ -4968,7 +5062,7 @@ export interface operations {
             };
         };
     };
-    readonly list_9: {
+    readonly list_11: {
         readonly parameters: {
             readonly query?: {
                 readonly page?: number;
@@ -5280,7 +5374,7 @@ export interface operations {
             };
         };
     };
-    readonly list_8: {
+    readonly list_10: {
         readonly parameters: {
             readonly query?: {
                 readonly page?: number;
@@ -5305,7 +5399,7 @@ export interface operations {
             };
         };
     };
-    readonly list_7: {
+    readonly list_9: {
         readonly parameters: {
             readonly query?: {
                 readonly page?: number;
@@ -5470,10 +5564,15 @@ export interface operations {
             };
         };
     };
-    readonly listByOrganization: {
+    readonly list_8: {
         readonly parameters: {
-            readonly query: {
-                readonly organizationId: number;
+            readonly query?: {
+                readonly deptCode?: string;
+                readonly deptName?: string;
+                readonly organizationId?: number;
+                readonly status?: string;
+                readonly page?: number;
+                readonly pageSize?: number;
             };
             readonly header?: never;
             readonly path?: never;
@@ -5487,7 +5586,7 @@ export interface operations {
                     readonly [name: string]: unknown;
                 };
                 content: {
-                    readonly "*/*": components["schemas"]["ApiResponseListDepartmentResponse"];
+                    readonly "*/*": components["schemas"]["ApiResponsePageResultDepartmentResponse"];
                 };
             };
         };
@@ -5512,6 +5611,28 @@ export interface operations {
                 };
                 content: {
                     readonly "*/*": components["schemas"]["ApiResponseDepartmentResponse"];
+                };
+            };
+        };
+    };
+    readonly tree: {
+        readonly parameters: {
+            readonly query: {
+                readonly organizationId: number;
+            };
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description OK */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "*/*": components["schemas"]["ApiResponseListDepartmentResponse"];
                 };
             };
         };
@@ -5608,7 +5729,7 @@ export interface operations {
             };
         };
     };
-    readonly list_6: {
+    readonly list_7: {
         readonly parameters: {
             readonly query?: never;
             readonly header?: never;
@@ -5865,7 +5986,7 @@ export interface operations {
             };
         };
     };
-    readonly list_5: {
+    readonly list_6: {
         readonly parameters: {
             readonly query?: {
                 readonly page?: number;
@@ -6117,7 +6238,7 @@ export interface operations {
             };
         };
     };
-    readonly list_4: {
+    readonly list_5: {
         readonly parameters: {
             readonly query?: never;
             readonly header?: never;
@@ -6324,7 +6445,7 @@ export interface operations {
             };
         };
     };
-    readonly list_3: {
+    readonly list_4: {
         readonly parameters: {
             readonly query?: never;
             readonly header?: never;
@@ -6506,10 +6627,16 @@ export interface operations {
             };
         };
     };
-    readonly listByDepartment: {
+    readonly list_3: {
         readonly parameters: {
-            readonly query: {
-                readonly departmentId: number;
+            readonly query?: {
+                readonly positionCode?: string;
+                readonly positionName?: string;
+                readonly departmentId?: number;
+                readonly category?: string;
+                readonly status?: string;
+                readonly page?: number;
+                readonly pageSize?: number;
             };
             readonly header?: never;
             readonly path?: never;
@@ -6523,7 +6650,7 @@ export interface operations {
                     readonly [name: string]: unknown;
                 };
                 content: {
-                    readonly "*/*": components["schemas"]["ApiResponseListPositionResponse"];
+                    readonly "*/*": components["schemas"]["ApiResponsePageResultPositionResponse"];
                 };
             };
         };
@@ -6548,6 +6675,28 @@ export interface operations {
                 };
                 content: {
                     readonly "*/*": components["schemas"]["ApiResponsePositionResponse"];
+                };
+            };
+        };
+    };
+    readonly listByDepartment: {
+        readonly parameters: {
+            readonly query: {
+                readonly departmentId: number;
+            };
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description OK */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "*/*": components["schemas"]["ApiResponseListPositionResponse"];
                 };
             };
         };

@@ -10,6 +10,7 @@ public record RoleDetailResponse(
         String description,
         String status,
         Boolean builtIn,
+        String roleCategory,
         Long version,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,

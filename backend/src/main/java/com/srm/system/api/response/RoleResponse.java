@@ -9,6 +9,7 @@ public record RoleResponse(
         String description,
         String status,
         Boolean builtIn,
+        String roleCategory,
         long userCount,
         Long version,
         LocalDateTime createdAt,

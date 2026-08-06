@@ -112,7 +112,7 @@ class AuthFlowIntegrationTest {
         for (JsonNode domain : adminTree) {
             pageCount += domain.path("children").size();
         }
-        assertThat(pageCount).isEqualTo(18);
+        assertThat(pageCount).isEqualTo(21);
         assertThat(adminMenus.getResponse().getContentAsString())
                 .doesNotContain("MENU_PROCUREMENT_FORECAST_PLAN");
 

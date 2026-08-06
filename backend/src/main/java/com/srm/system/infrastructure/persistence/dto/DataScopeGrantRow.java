@@ -5,5 +5,6 @@ public record DataScopeGrantRow(
         String roleCode,
         String scopeType,
         Boolean includeChildren,
-        String operationMode) {
+        String operationMode,
+        String scopeOrgIds) {
 }

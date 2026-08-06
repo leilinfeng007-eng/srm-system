@@ -34,4 +34,22 @@ public interface SysRoleMapper extends BaseMapper<SysRoleEntity> {
               AND p.enabled = TRUE
             """)
     List<String> selectPermissionCodesByRoleId(@Param("roleId") long roleId);
+
+    @Select("""
+            SELECT COUNT(DISTINCT ur.user_id)
+            FROM sys_user_role ur
+            JOIN sys_user u ON u.id = ur.user_id
+            WHERE ur.role_id = #{roleId}
+              AND ur.status = 'ACTIVE'
+              AND u.status = 'ACTIVE'
+              AND NOT EXISTS (
+                SELECT 1 FROM sys_user_role ur2
+                JOIN sys_role r2 ON r2.id = ur2.role_id
+                WHERE ur2.user_id = ur.user_id
+                  AND ur2.role_id != #{roleId}
+                  AND ur2.status = 'ACTIVE'
+                  AND r2.status = 'ACTIVE'
+              )
+            """)
+    long countUsersLosingAllRoles(@Param("roleId") long roleId);
 }

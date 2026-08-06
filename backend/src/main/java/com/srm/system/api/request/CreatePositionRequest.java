@@ -8,6 +8,7 @@ public record CreatePositionRequest(
         @NotBlank @Size(max = 64) String positionCode,
         @NotBlank @Size(max = 100) String positionName,
         @NotNull Long departmentId,
+        @Size(max = 64) String category,
         @Size(max = 500) String responsibility,
         Integer sortOrder) {
 }

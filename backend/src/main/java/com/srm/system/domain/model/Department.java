@@ -9,6 +9,7 @@ public record Department(
         Long organizationId,
         Long parentId,
         String managerName,
+        Long managerId,
         Integer sortOrder,
         String path,
         Integer level,

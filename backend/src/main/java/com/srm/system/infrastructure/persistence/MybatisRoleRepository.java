@@ -253,7 +253,8 @@ public class MybatisRoleRepository implements RoleRepository {
         return dataPolicyMapper.selectList(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<SysRoleDataPolicyEntity>()
                 .eq(SysRoleDataPolicyEntity::getRoleId, roleId)).stream()
                 .map(p -> new DataPolicyRequest(p.getDomainCode(), p.getDimensionCode(),
-                        p.getScopeType(), Boolean.TRUE.equals(p.getIncludeChildren()), p.getOperationMode()))
+                        p.getScopeType(), Boolean.TRUE.equals(p.getIncludeChildren()),
+                        p.getOperationMode(), p.getScopeOrgIds()))
                 .collect(Collectors.toList());
     }
 
@@ -270,6 +271,7 @@ public class MybatisRoleRepository implements RoleRepository {
                 entity.setScopeType(policy.scopeType());
                 entity.setIncludeChildren(policy.includeChildren());
                 entity.setOperationMode(policy.operationMode());
+                entity.setScopeOrgIds(policy.scopeOrgIds());
                 entity.setStatus("ACTIVE");
                 entity.setCreatedBy(actor);
                 entity.setUpdatedBy(actor);
@@ -282,6 +284,7 @@ public class MybatisRoleRepository implements RoleRepository {
         return new Role(
                 entity.getId(), entity.getRoleCode(), entity.getRoleName(),
                 entity.getDescription(), entity.getStatus(), entity.getBuiltIn(),
+                entity.getRoleCategory(),
                 entity.getCreatedBy(), entity.getCreatedAt(),
                 entity.getUpdatedBy(), entity.getUpdatedAt(), entity.getVersion());
     }
@@ -294,11 +297,17 @@ public class MybatisRoleRepository implements RoleRepository {
         entity.setDescription(role.description());
         entity.setStatus(role.status());
         entity.setBuiltIn(role.builtIn());
+        entity.setRoleCategory(role.roleCategory());
         entity.setCreatedBy(role.createdBy());
         entity.setCreatedAt(role.createdAt());
         entity.setUpdatedBy(role.updatedBy());
         entity.setUpdatedAt(role.updatedAt());
         entity.setVersion(role.version());
         return entity;
+    }
+
+    @Override
+    public long countUsersLosingAllRoles(Long roleId) {
+        return roleMapper.countUsersLosingAllRoles(roleId);
     }
 }

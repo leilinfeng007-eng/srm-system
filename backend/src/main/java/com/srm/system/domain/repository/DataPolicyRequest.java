@@ -5,5 +5,6 @@ public record DataPolicyRequest(
         String dimensionCode,
         String scopeType,
         boolean includeChildren,
-        String operationMode) {
+        String operationMode,
+        String scopeOrgIds) {
 }

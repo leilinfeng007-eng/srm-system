@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
@@ -27,7 +28,7 @@ public class MybatisAuditRepository implements AuditRecorder {
         this.operationLogMapper = operationLogMapper;
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public void record(String actionCode, String targetType, String targetId, String resultCode,
                        String beforeSummary, String afterSummary, String reason) {

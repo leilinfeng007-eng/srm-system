@@ -44,14 +44,14 @@
     <select id="countActivePositions" resultType="java.lang.Long">
         SELECT COUNT(*)
         FROM sys_position
-        WHERE department_id = #{deptId}
+        WHERE department_id = #{departmentId}
           AND status = 'ACTIVE'
     </select>
 
     <select id="countActiveUsers" resultType="java.lang.Long">
         SELECT COUNT(*)
         FROM sys_user
-        WHERE main_department_id = #{deptId}
+        WHERE main_department_id = #{departmentId}
           AND status = 'ACTIVE'
     </select>
 </mapper>

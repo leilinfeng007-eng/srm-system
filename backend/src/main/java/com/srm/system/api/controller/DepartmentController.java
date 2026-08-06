@@ -1,6 +1,7 @@
 package com.srm.system.api.controller;
 
 import com.srm.common.api.ApiResponse;
+import com.srm.common.api.PageResult;
 import com.srm.system.api.request.CreateDepartmentRequest;
 import com.srm.system.api.request.UpdateDepartmentRequest;
 import com.srm.system.api.response.DepartmentResponse;
@@ -29,18 +30,32 @@ public class DepartmentController {
         this.departmentService = departmentService;
     }
 
-    @GetMapping
-    @Operation(summary = "按组织查询部门列表")
+    @GetMapping("/tree")
+    @Operation(summary = "按组织查询部门树")
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasAuthority('masterdata:organization:view')")
-    public ApiResponse<List<DepartmentResponse>> listByOrganization(@RequestParam Long organizationId) {
-        return ApiResponse.success(departmentService.listByOrganizationId(organizationId));
+    @PreAuthorize("hasAuthority('system:department:view')")
+    public ApiResponse<List<DepartmentResponse>> tree(@RequestParam Long organizationId) {
+        return ApiResponse.success(departmentService.tree(organizationId));
+    }
+
+    @GetMapping
+    @Operation(summary = "分页查询部门列表")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasAuthority('system:department:view')")
+    public ApiResponse<PageResult<DepartmentResponse>> list(
+            @RequestParam(required = false) String deptCode,
+            @RequestParam(required = false) String deptName,
+            @RequestParam(required = false) Long organizationId,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int pageSize) {
+        return ApiResponse.success(departmentService.list(deptCode, deptName, organizationId, status, page, pageSize));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "获取部门详情")
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasAuthority('masterdata:organization:view')")
+    @PreAuthorize("hasAuthority('system:department:view')")
     public ApiResponse<DepartmentResponse> get(@PathVariable Long id) {
         return ApiResponse.success(departmentService.getById(id));
     }
@@ -48,7 +63,7 @@ public class DepartmentController {
     @PostMapping
     @Operation(summary = "创建部门")
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasAuthority('masterdata:organization:create')")
+    @PreAuthorize("hasAuthority('system:department:create')")
     public ApiResponse<DepartmentResponse> create(@Valid @RequestBody CreateDepartmentRequest request) {
         return ApiResponse.success(departmentService.create(request));
     }
@@ -56,16 +71,16 @@ public class DepartmentController {
     @PutMapping("/{id}")
     @Operation(summary = "更新部门")
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasAuthority('masterdata:organization:update')")
+    @PreAuthorize("hasAuthority('system:department:update')")
     public ApiResponse<DepartmentResponse> update(@PathVariable Long id,
-                                                   @Valid @RequestBody UpdateDepartmentRequest request) {
+                                                    @Valid @RequestBody UpdateDepartmentRequest request) {
         return ApiResponse.success(departmentService.update(id, request));
     }
 
     @PostMapping("/{id}/enable")
     @Operation(summary = "启用部门")
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasAuthority('masterdata:organization:enable')")
+    @PreAuthorize("hasAuthority('system:department:enable')")
     public ApiResponse<Void> enable(@PathVariable Long id) {
         departmentService.enable(id);
         return ApiResponse.success();
@@ -74,7 +89,7 @@ public class DepartmentController {
     @PostMapping("/{id}/disable")
     @Operation(summary = "停用部门")
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasAuthority('masterdata:organization:disable')")
+    @PreAuthorize("hasAuthority('system:department:disable')")
     public ApiResponse<Void> disable(@PathVariable Long id) {
         departmentService.disable(id);
         return ApiResponse.success();

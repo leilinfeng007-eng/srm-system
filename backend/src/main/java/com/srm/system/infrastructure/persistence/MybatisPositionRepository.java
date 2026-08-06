@@ -107,6 +107,7 @@ public class MybatisPositionRepository implements PositionRepository {
                 entity.getPositionCode(),
                 entity.getPositionName(),
                 entity.getDepartmentId(),
+                entity.getCategory(),
                 entity.getResponsibility(),
                 entity.getSortOrder(),
                 entity.getStatus(),
@@ -123,6 +124,7 @@ public class MybatisPositionRepository implements PositionRepository {
         entity.setPositionCode(position.positionCode());
         entity.setPositionName(position.positionName());
         entity.setDepartmentId(position.departmentId());
+        entity.setCategory(position.category());
         entity.setResponsibility(position.responsibility());
         entity.setSortOrder(position.sortOrder());
         entity.setStatus(position.status());

@@ -16,6 +16,7 @@ public class SysRoleEntity {
     private String description;
     private String status;
     private Boolean builtIn;
+    private String roleCategory;
     private String createdBy;
     private LocalDateTime createdAt;
     private String updatedBy;
@@ -35,6 +36,8 @@ public class SysRoleEntity {
     public void setStatus(String status) { this.status = status; }
     public Boolean getBuiltIn() { return builtIn; }
     public void setBuiltIn(Boolean builtIn) { this.builtIn = builtIn; }
+    public String getRoleCategory() { return roleCategory; }
+    public void setRoleCategory(String roleCategory) { this.roleCategory = roleCategory; }
     public String getCreatedBy() { return createdBy; }
     public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
     public LocalDateTime getCreatedAt() { return createdAt; }

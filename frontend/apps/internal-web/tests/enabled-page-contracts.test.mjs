@@ -11,7 +11,7 @@ function sourceOf(componentKey) {
 
 test('every enabled Stage-1 page is implemented and avoids retired endpoint guesses', () => {
   const sources = enabled.map((feature) => sourceOf(feature.componentKey))
-  assert.equal(sources.length, 18)
+  assert.equal(sources.length, 21)
   for (const source of sources) {
     assert.doesNotMatch(source, /SkeletonFeaturePage/)
     assert.doesNotMatch(source, /\/master-data\/plants(?:[/?'"`]|$)/)

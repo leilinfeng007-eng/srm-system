@@ -1003,34 +1003,67 @@
       "features": [
         {
           "domainCode": "system",
-          "menuCode": "MENU_SYSTEM_USER",
-          "label": "用户",
-          "route": "/system/user",
-          "componentKey": "system/user/index",
-          "permission": "system:user:view",
+          "menuCode": "MENU_SYSTEM_DEPARTMENT",
+          "label": "部门管理",
+          "route": "/system/department",
+          "componentKey": "system/department/index",
+          "permission": "system:department:view",
           "sortOrder": 10,
           "phase": 1,
           "enabled": true
         },
         {
           "domainCode": "system",
-          "menuCode": "MENU_SYSTEM_ROLE",
-          "label": "角色与挂载用户",
-          "route": "/system/role",
-          "componentKey": "system/role/index",
-          "permission": "system:role:view",
+          "menuCode": "MENU_SYSTEM_POSITION",
+          "label": "岗位管理",
+          "route": "/system/position",
+          "componentKey": "system/position/index",
+          "permission": "system:position:view",
           "sortOrder": 20,
           "phase": 1,
           "enabled": true
         },
         {
           "domainCode": "system",
-          "menuCode": "MENU_SYSTEM_PERMISSION",
-          "label": "权限与数据域",
-          "route": "/system/permission",
-          "componentKey": "system/permission/index",
-          "permission": "system:permission:view",
+          "menuCode": "MENU_SYSTEM_USER",
+          "label": "内部用户",
+          "route": "/system/user",
+          "componentKey": "system/user/index",
+          "permission": "system:user:view",
           "sortOrder": 30,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "system",
+          "menuCode": "MENU_SYSTEM_ROLE",
+          "label": "角色管理",
+          "route": "/system/role",
+          "componentKey": "system/role/index",
+          "permission": "system:role:view",
+          "sortOrder": 40,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "system",
+          "menuCode": "MENU_SYSTEM_FUNCTION_PERMISSION",
+          "label": "功能权限",
+          "route": "/system/function-permission",
+          "componentKey": "system/function-permission/index",
+          "permission": "system:function-permission:view",
+          "sortOrder": 50,
+          "phase": 1,
+          "enabled": true
+        },
+        {
+          "domainCode": "system",
+          "menuCode": "MENU_SYSTEM_DATA_PERMISSION",
+          "label": "数据权限",
+          "route": "/system/data-permission",
+          "componentKey": "system/data-permission/index",
+          "permission": "system:data-permission:view",
+          "sortOrder": 60,
           "phase": 1,
           "enabled": true
         },
@@ -1041,7 +1074,7 @@
           "route": "/system/workflow",
           "componentKey": "system/workflow/index",
           "permission": "system:workflow:view",
-          "sortOrder": 40,
+          "sortOrder": 70,
           "phase": 1,
           "enabled": true
         },
@@ -1052,7 +1085,7 @@
           "route": "/system/dictionary-parameter",
           "componentKey": "system/dictionary-parameter/index",
           "permission": "system:dictionary-parameter:view",
-          "sortOrder": 50,
+          "sortOrder": 80,
           "phase": 1,
           "enabled": true
         },
@@ -1063,7 +1096,7 @@
           "route": "/system/template-attachment",
           "componentKey": "system/template-attachment/index",
           "permission": "system:template-attachment:view",
-          "sortOrder": 60,
+          "sortOrder": 90,
           "phase": 1,
           "enabled": true
         },
@@ -1074,7 +1107,7 @@
           "route": "/system/message",
           "componentKey": "system/message/index",
           "permission": "system:message:view",
-          "sortOrder": 70,
+          "sortOrder": 100,
           "phase": 1,
           "enabled": true
         },
@@ -1085,7 +1118,7 @@
           "route": "/system/audit-log",
           "componentKey": "system/audit-log/index",
           "permission": "system:audit-log:view",
-          "sortOrder": 80,
+          "sortOrder": 110,
           "phase": 1,
           "enabled": true
         },
@@ -1096,7 +1129,7 @@
           "route": "/system/integration-job",
           "componentKey": "system/integration-job/index",
           "permission": "system:integration-job:view",
-          "sortOrder": 90,
+          "sortOrder": 120,
           "phase": 1,
           "enabled": true
         }

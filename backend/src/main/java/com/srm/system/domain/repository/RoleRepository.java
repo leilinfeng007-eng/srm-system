@@ -51,4 +51,6 @@ public interface RoleRepository {
     void replaceDataPolicies(Long roleId, List<DataPolicyRequest> policies, String actor);
 
     List<DataPolicyRequest> findDataPolicies(Long roleId);
+
+    long countUsersLosingAllRoles(Long roleId);
 }
