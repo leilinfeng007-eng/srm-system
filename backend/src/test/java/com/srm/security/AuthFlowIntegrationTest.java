@@ -37,7 +37,7 @@ class AuthFlowIntegrationTest {
     @Test
     void flywayCreatesExactlyTenSystemTablesAndBootstrapIsIdempotent() {
         assertThat(baseline.countSystemTables()).isEqualTo(37);
-        assertThat(baseline.countRoles()).isEqualTo(7);
+        assertThat(baseline.countBootstrapRoles()).isEqualTo(7);
         assertThat(baseline.countUsers()).isGreaterThanOrEqualTo(2);
     }
 
