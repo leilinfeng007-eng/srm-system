@@ -27,7 +27,12 @@ public interface IntegrationEventRepository {
 
     boolean resetInboxForRetry(Long id);
 
-    PageResult<InboxEvent> listInbox(int page, int size, String status);
+    default PageResult<InboxEvent> listInbox(int page, int size, String status) {
+        return listInbox(page, size, status, null, null, null, null);
+    }
+
+    PageResult<InboxEvent> listInbox(int page, int size, String status, String sourceSystem,
+                                     String objectType, LocalDateTime from, LocalDateTime to);
 
     OutboxEvent createOutbox(OutboxEvent event);
 
@@ -36,12 +41,24 @@ public interface IntegrationEventRepository {
     boolean claimOutbox(Long id, LocalDateTime now);
 
     boolean markOutboxPublished(Long id);
-
     void markOutboxFailed(Long id, String error, LocalDateTime nextRetryAt);
 
     void markOutboxNoTransport(Long id, String reason);
 
     boolean resetOutboxForRetry(Long id);
 
-    PageResult<OutboxEvent> listOutbox(int page, int size, String status);
+    /**
+     * Atomically moves one due FAILED outbox event back to READY.
+     * A FAILED event is due when its next_retry_at has passed and it has
+     * not exhausted max_attempts. Returns the event id, or null when no
+     * event is due. Never touches DEAD or still-backing-off events.
+     */
+    Long releaseDueOutbox(LocalDateTime now);
+
+    default PageResult<OutboxEvent> listOutbox(int page, int size, String status) {
+        return listOutbox(page, size, status, null, null, null, null);
+    }
+
+    PageResult<OutboxEvent> listOutbox(int page, int size, String status, String eventType,
+                                       String objectType, LocalDateTime from, LocalDateTime to);
 }

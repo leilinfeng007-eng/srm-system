@@ -430,9 +430,9 @@ export interface paths {
             readonly cookie?: never;
         };
         /** 获取组织详情 */
-        readonly get: operations["get_6"];
+        readonly get: operations["get_8"];
         /** 更新组织 */
-        readonly put: operations["update_7"];
+        readonly put: operations["update_9"];
         readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
@@ -811,7 +811,7 @@ export interface paths {
             readonly cookie?: never;
         };
         /** Get approval */
-        readonly get: operations["get_11"];
+        readonly get: operations["get_12"];
         readonly put?: never;
         readonly post?: never;
         readonly delete?: never;
@@ -947,7 +947,7 @@ export interface paths {
             readonly cookie?: never;
         };
         /** Get attachment */
-        readonly get: operations["get_10"];
+        readonly get: operations["get_11"];
         readonly put?: never;
         readonly post?: never;
         /** Delete attachment */
@@ -1000,6 +1000,23 @@ export interface paths {
         };
         /** 审计日志分页查询 */
         readonly get: operations["list_10"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/system/audit-logs/{id}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** 审计日志详情 */
+        readonly get: operations["get_10"];
         readonly put?: never;
         readonly post?: never;
         readonly delete?: never;
@@ -1170,9 +1187,9 @@ export interface paths {
             readonly cookie?: never;
         };
         /** 获取部门详情 */
-        readonly get: operations["get_5"];
+        readonly get: operations["get_7"];
         /** 更新部门 */
-        readonly put: operations["update_6"];
+        readonly put: operations["update_8"];
         readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
@@ -1309,9 +1326,9 @@ export interface paths {
             readonly cookie?: never;
         };
         /** Get dictionary */
-        readonly get: operations["get_4"];
+        readonly get: operations["get_6"];
         /** Update dictionary */
-        readonly put: operations["update_5"];
+        readonly put: operations["update_7"];
         readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
@@ -1379,8 +1396,9 @@ export interface paths {
             readonly cookie?: never;
         };
         /** Get document template */
-        readonly get: operations["get_8"];
-        readonly put?: never;
+        readonly get: operations["get_5"];
+        /** Update document template */
+        readonly put: operations["update_6"];
         readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
@@ -1474,6 +1492,40 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/system/inbox-events/{id}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** Get integration */
+        readonly get: operations["getInbox"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/system/inbox-events/{id}/attempts": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** Execute integration */
+        readonly get: operations["inboxAttempts"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/system/inbox-events/{id}/retry": {
         readonly parameters: {
             readonly query?: never;
@@ -1543,6 +1595,23 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/system/number-rules/preview": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /** Execute number rule */
+        readonly post: operations["preview"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/system/number-rules/{id}": {
         readonly parameters: {
             readonly query?: never;
@@ -1552,7 +1621,7 @@ export interface paths {
         };
         readonly get?: never;
         /** Update number rule */
-        readonly put: operations["update_4"];
+        readonly put: operations["update_5"];
         readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
@@ -1612,6 +1681,40 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/system/outbox-events/{id}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** Get integration */
+        readonly get: operations["getOutbox"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/system/outbox-events/{id}/attempts": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /** Execute integration */
+        readonly get: operations["outboxAttempts"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/system/outbox-events/{id}/retry": {
         readonly parameters: {
             readonly query?: never;
@@ -1655,8 +1758,9 @@ export interface paths {
             readonly cookie?: never;
         };
         /** Get parameter */
-        readonly get: operations["get_7"];
-        readonly put?: never;
+        readonly get: operations["get_4"];
+        /** Update parameter */
+        readonly put: operations["update_4"];
         readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
@@ -2429,6 +2533,14 @@ export interface components {
             readonly timestamp?: string;
             readonly traceId?: string;
         };
+        readonly ApiResponseListObject: {
+            readonly code?: string;
+            readonly data?: readonly Record<string, never>[];
+            readonly message?: string;
+            /** Format: date-time */
+            readonly timestamp?: string;
+            readonly traceId?: string;
+        };
         readonly ApiResponseListOrganizationDetail: {
             readonly code?: string;
             readonly data?: readonly components["schemas"]["OrganizationDetail"][];
@@ -2950,6 +3062,10 @@ export interface components {
             readonly templateCode: string;
             readonly templateName: string;
         };
+        readonly DocumentTemplateUpdateRequest: {
+            readonly purpose?: string;
+            readonly templateName?: string;
+        };
         readonly EffectivePermissionResponse: {
             readonly authorizationPaths?: readonly string[];
             readonly permissionCode?: string;
@@ -3072,6 +3188,11 @@ export interface components {
             /** Format: int32 */
             readonly sortOrder?: number;
             readonly status?: string;
+        };
+        readonly NumberRulePreviewRequest: {
+            /** Format: int64 */
+            readonly orgId?: number;
+            readonly ruleCode: string;
         };
         readonly NumberRuleRequest: {
             readonly dateFormat?: string;
@@ -4425,7 +4546,7 @@ export interface operations {
             };
         };
     };
-    readonly get_6: {
+    readonly get_8: {
         readonly parameters: {
             readonly query?: never;
             readonly header?: never;
@@ -4447,7 +4568,7 @@ export interface operations {
             };
         };
     };
-    readonly update_7: {
+    readonly update_9: {
         readonly parameters: {
             readonly query?: never;
             readonly header?: never;
@@ -5086,7 +5207,7 @@ export interface operations {
             };
         };
     };
-    readonly get_11: {
+    readonly get_12: {
         readonly parameters: {
             readonly query?: never;
             readonly header?: never;
@@ -5279,7 +5400,7 @@ export interface operations {
             };
         };
     };
-    readonly get_10: {
+    readonly get_11: {
         readonly parameters: {
             readonly query?: never;
             readonly header?: never;
@@ -5379,11 +5500,39 @@ export interface operations {
             readonly query?: {
                 readonly page?: number;
                 readonly pageSize?: number;
+                readonly operatorName?: string;
                 readonly actionCode?: string;
                 readonly targetType?: string;
+                readonly targetId?: string;
+                readonly resultCode?: string;
+                readonly traceId?: string;
+                readonly from?: string;
+                readonly to?: string;
             };
             readonly header?: never;
             readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description OK */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "*/*": components["schemas"]["ApiResponseObject"];
+                };
+            };
+        };
+    };
+    readonly get_10: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                readonly id: number;
+            };
             readonly cookie?: never;
         };
         readonly requestBody?: never;
@@ -5637,7 +5786,7 @@ export interface operations {
             };
         };
     };
-    readonly get_5: {
+    readonly get_7: {
         readonly parameters: {
             readonly query?: never;
             readonly header?: never;
@@ -5659,7 +5808,7 @@ export interface operations {
             };
         };
     };
-    readonly update_6: {
+    readonly update_8: {
         readonly parameters: {
             readonly query?: never;
             readonly header?: never;
@@ -5731,7 +5880,10 @@ export interface operations {
     };
     readonly list_7: {
         readonly parameters: {
-            readonly query?: never;
+            readonly query?: {
+                readonly keyword?: string;
+                readonly status?: string;
+            };
             readonly header?: never;
             readonly path?: never;
             readonly cookie?: never;
@@ -5894,7 +6046,7 @@ export interface operations {
             };
         };
     };
-    readonly get_4: {
+    readonly get_6: {
         readonly parameters: {
             readonly query?: never;
             readonly header?: never;
@@ -5916,7 +6068,7 @@ export interface operations {
             };
         };
     };
-    readonly update_5: {
+    readonly update_7: {
         readonly parameters: {
             readonly query?: never;
             readonly header?: never;
@@ -6034,7 +6186,7 @@ export interface operations {
             };
         };
     };
-    readonly get_8: {
+    readonly get_5: {
         readonly parameters: {
             readonly query?: never;
             readonly header?: never;
@@ -6052,6 +6204,32 @@ export interface operations {
                 };
                 content: {
                     readonly "*/*": components["schemas"]["ApiResponseObject"];
+                };
+            };
+        };
+    };
+    readonly update_6: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                readonly id: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": components["schemas"]["DocumentTemplateUpdateRequest"];
+            };
+        };
+        readonly responses: {
+            /** @description OK */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "*/*": components["schemas"]["ApiResponseVoid"];
                 };
             };
         };
@@ -6154,6 +6332,10 @@ export interface operations {
                 readonly page?: number;
                 readonly size?: number;
                 readonly status?: string;
+                readonly sourceSystem?: string;
+                readonly objectType?: string;
+                readonly from?: string;
+                readonly to?: string;
             };
             readonly header?: never;
             readonly path?: never;
@@ -6192,6 +6374,50 @@ export interface operations {
                 };
                 content: {
                     readonly "*/*": components["schemas"]["ApiResponseInboxEvent"];
+                };
+            };
+        };
+    };
+    readonly getInbox: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                readonly id: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description OK */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "*/*": components["schemas"]["ApiResponseInboxEvent"];
+                };
+            };
+        };
+    };
+    readonly inboxAttempts: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                readonly id: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description OK */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "*/*": components["schemas"]["ApiResponseListObject"];
                 };
             };
         };
@@ -6305,7 +6531,31 @@ export interface operations {
             };
         };
     };
-    readonly update_4: {
+    readonly preview: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": components["schemas"]["NumberRulePreviewRequest"];
+            };
+        };
+        readonly responses: {
+            /** @description OK */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "*/*": components["schemas"]["ApiResponseString"];
+                };
+            };
+        };
+    };
+    readonly update_5: {
         readonly parameters: {
             readonly query?: never;
             readonly header?: never;
@@ -6381,6 +6631,10 @@ export interface operations {
                 readonly page?: number;
                 readonly size?: number;
                 readonly status?: string;
+                readonly eventType?: string;
+                readonly objectType?: string;
+                readonly from?: string;
+                readonly to?: string;
             };
             readonly header?: never;
             readonly path?: never;
@@ -6419,6 +6673,50 @@ export interface operations {
                 };
                 content: {
                     readonly "*/*": components["schemas"]["ApiResponseOutboxEvent"];
+                };
+            };
+        };
+    };
+    readonly getOutbox: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                readonly id: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description OK */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "*/*": components["schemas"]["ApiResponseOutboxEvent"];
+                };
+            };
+        };
+    };
+    readonly outboxAttempts: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                readonly id: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            /** @description OK */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "*/*": components["schemas"]["ApiResponseListObject"];
                 };
             };
         };
@@ -6489,7 +6787,7 @@ export interface operations {
             };
         };
     };
-    readonly get_7: {
+    readonly get_4: {
         readonly parameters: {
             readonly query?: never;
             readonly header?: never;
@@ -6507,6 +6805,32 @@ export interface operations {
                 };
                 content: {
                     readonly "*/*": components["schemas"]["ApiResponseObject"];
+                };
+            };
+        };
+    };
+    readonly update_4: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                readonly id: number;
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/json": components["schemas"]["ParameterRequest"];
+            };
+        };
+        readonly responses: {
+            /** @description OK */
+            readonly 200: {
+                headers: {
+                    readonly [name: string]: unknown;
+                };
+                content: {
+                    readonly "*/*": components["schemas"]["ApiResponseVoid"];
                 };
             };
         };
@@ -7409,6 +7733,7 @@ export interface operations {
                 readonly page?: number;
                 readonly pageSize?: number;
                 readonly status?: string;
+                readonly keyword?: string;
             };
             readonly header?: never;
             readonly path?: never;

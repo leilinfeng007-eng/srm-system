@@ -129,12 +129,33 @@ public class MybatisIntegrationRepository implements IntegrationEventRepository 
     }
 
     @Override
-    public PageResult<InboxEvent> listInbox(int page, int size, String status) {
+    public PageResult<InboxEvent> listInbox(int page, int size, String status, String sourceSystem,
+                                            String objectType, LocalDateTime from, LocalDateTime to) {
+        LambdaQueryWrapper<SysInboxEventEntity> countQuery = new LambdaQueryWrapper<>();
         LambdaQueryWrapper<SysInboxEventEntity> query = new LambdaQueryWrapper<>();
-        if (status != null && !status.isBlank()) query.eq(SysInboxEventEntity::getStatus, status);
-        query.orderByDesc(SysInboxEventEntity::getReceivedAt);
-        long total = inboxMapper.selectCount(query);
+        if (status != null && !status.isBlank()) {
+            countQuery.eq(SysInboxEventEntity::getStatus, status);
+            query.eq(SysInboxEventEntity::getStatus, status);
+        }
+        if (sourceSystem != null && !sourceSystem.isBlank()) {
+            countQuery.eq(SysInboxEventEntity::getSourceSystem, sourceSystem);
+            query.eq(SysInboxEventEntity::getSourceSystem, sourceSystem);
+        }
+        if (objectType != null && !objectType.isBlank()) {
+            countQuery.eq(SysInboxEventEntity::getObjectType, objectType);
+            query.eq(SysInboxEventEntity::getObjectType, objectType);
+        }
+        if (from != null) {
+            countQuery.ge(SysInboxEventEntity::getReceivedAt, from);
+            query.ge(SysInboxEventEntity::getReceivedAt, from);
+        }
+        if (to != null) {
+            countQuery.le(SysInboxEventEntity::getReceivedAt, to);
+            query.le(SysInboxEventEntity::getReceivedAt, to);
+        }
+        long total = inboxMapper.selectCount(countQuery);
         int offset = (page - 1) * size;
+        query.orderByDesc(SysInboxEventEntity::getReceivedAt);
         return PageResult.of(inboxMapper.selectList(query.last("LIMIT " + offset + "," + size))
                 .stream().map(this::toDomain).toList(), page, size, total);
     }
@@ -178,7 +199,29 @@ public class MybatisIntegrationRepository implements IntegrationEventRepository 
         return outboxMapper.update(null, new LambdaUpdateWrapper<SysOutboxEventEntity>()
                 .eq(SysOutboxEventEntity::getId, id)
                 .eq(SysOutboxEventEntity::getStatus, "READY")
+                .apply("(next_retry_at IS NULL OR next_retry_at <= {0})", now)
+                .apply("attempt_count < max_attempts")
                 .set(SysOutboxEventEntity::getStatus, "PROCESSING")) == 1;
+    }
+
+    @Override
+    @Transactional
+    public Long releaseDueOutbox(LocalDateTime now) {
+        SysOutboxEventEntity due = outboxMapper.selectOne(new LambdaQueryWrapper<SysOutboxEventEntity>()
+                .eq(SysOutboxEventEntity::getStatus, "FAILED")
+                .isNotNull(SysOutboxEventEntity::getNextRetryAt)
+                .le(SysOutboxEventEntity::getNextRetryAt, now)
+                .apply("attempt_count < max_attempts")
+                .orderByAsc(SysOutboxEventEntity::getNextRetryAt)
+                .last("LIMIT 1"));
+        if (due == null) return null;
+        int updated = outboxMapper.update(null, new LambdaUpdateWrapper<SysOutboxEventEntity>()
+                .eq(SysOutboxEventEntity::getId, due.getId())
+                .eq(SysOutboxEventEntity::getStatus, "FAILED")
+                .le(SysOutboxEventEntity::getNextRetryAt, now)
+                .apply("attempt_count < max_attempts")
+                .set(SysOutboxEventEntity::getStatus, "READY"));
+        return updated == 1 ? due.getId() : null;
     }
 
     @Override
@@ -232,12 +275,33 @@ public class MybatisIntegrationRepository implements IntegrationEventRepository 
     }
 
     @Override
-    public PageResult<OutboxEvent> listOutbox(int page, int size, String status) {
+    public PageResult<OutboxEvent> listOutbox(int page, int size, String status, String eventType,
+                                              String objectType, LocalDateTime from, LocalDateTime to) {
+        LambdaQueryWrapper<SysOutboxEventEntity> countQuery = new LambdaQueryWrapper<>();
         LambdaQueryWrapper<SysOutboxEventEntity> query = new LambdaQueryWrapper<>();
-        if (status != null && !status.isBlank()) query.eq(SysOutboxEventEntity::getStatus, status);
-        query.orderByDesc(SysOutboxEventEntity::getCreatedAt);
-        long total = outboxMapper.selectCount(query);
+        if (status != null && !status.isBlank()) {
+            countQuery.eq(SysOutboxEventEntity::getStatus, status);
+            query.eq(SysOutboxEventEntity::getStatus, status);
+        }
+        if (eventType != null && !eventType.isBlank()) {
+            countQuery.eq(SysOutboxEventEntity::getEventType, eventType);
+            query.eq(SysOutboxEventEntity::getEventType, eventType);
+        }
+        if (objectType != null && !objectType.isBlank()) {
+            countQuery.eq(SysOutboxEventEntity::getObjectType, objectType);
+            query.eq(SysOutboxEventEntity::getObjectType, objectType);
+        }
+        if (from != null) {
+            countQuery.ge(SysOutboxEventEntity::getOccurredAt, from);
+            query.ge(SysOutboxEventEntity::getOccurredAt, from);
+        }
+        if (to != null) {
+            countQuery.le(SysOutboxEventEntity::getOccurredAt, to);
+            query.le(SysOutboxEventEntity::getOccurredAt, to);
+        }
+        long total = outboxMapper.selectCount(countQuery);
         int offset = (page - 1) * size;
+        query.orderByDesc(SysOutboxEventEntity::getCreatedAt);
         return PageResult.of(outboxMapper.selectList(query.last("LIMIT " + offset + "," + size))
                 .stream().map(this::toDomain).toList(), page, size, total);
     }

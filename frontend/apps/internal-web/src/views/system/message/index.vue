@@ -47,8 +47,9 @@ onMounted(()=>{fetchData();loadUnread()})
       </div>
       <el-table :data="data" v-loading="loading" border size="small" style="margin-top:12px" empty-text="暂无消息">
         <el-table-column prop="title" label="标题" width="200"/>
-        <el-table-column prop="content" label="内容" min-width="240" show-overflow-tooltip/>
-        <el-table-column label="类型" width="120"><template #default="{row}">{{row.sourceType}}</template></el-table-column>
+        <el-table-column prop="content" label="内容" min-width="220" show-overflow-tooltip/>
+        <el-table-column label="来源" width="120"><template #default="{row}">{{row.sourceType||'-'}}</template></el-table-column>
+        <el-table-column label="业务对象" width="120"><template #default="{row}">{{row.sourceId||'-'}}</template></el-table-column>
         <el-table-column label="状态" width="80"><template #default="{row}"><el-tag :type="statusType(row.status)" size="small">{{statusLabel(row.status)}}</el-tag></template></el-table-column>
         <el-table-column prop="createdAt" label="时间" width="160"/>
         <el-table-column label="操作" width="100"><template #default="{row}"><el-button v-if="canManage&&row.status==='UNREAD'" link type="primary" size="small" @click="markRead(row)">标为已读</el-button></template></el-table-column>

@@ -24,8 +24,23 @@ public class AuditLogController {
     public ApiResponse<?> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String operatorName,
             @RequestParam(required = false) String actionCode,
-            @RequestParam(required = false) String targetType) {
-        return ApiResponse.success(governance.auditLogs(page, pageSize, actionCode, targetType));
+            @RequestParam(required = false) String targetType,
+            @RequestParam(required = false) String targetId,
+            @RequestParam(required = false) String resultCode,
+            @RequestParam(required = false) String traceId,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime from,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime to) {
+        return ApiResponse.success(governance.auditLogs(page, pageSize, operatorName, actionCode,
+                targetType, targetId, resultCode, traceId, from, to));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "审计日志详情")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasAuthority('system:audit-log:view')")
+    public ApiResponse<?> get(@PathVariable Long id) {
+        return ApiResponse.success(governance.auditLog(id));
     }
 }

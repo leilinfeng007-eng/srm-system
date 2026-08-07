@@ -32,13 +32,19 @@ public class MybatisBatchJobRepository implements BatchJobRepository {
 
     @Override
     public PageResult<BatchJob> findPage(int page, int pageSize, String objectType, String creator) {
+        var countWrapper = new LambdaQueryWrapper<SysBatchJobEntity>();
         var wrapper = new LambdaQueryWrapper<SysBatchJobEntity>();
-        if (objectType != null && !objectType.isEmpty())
+        if (objectType != null && !objectType.isEmpty()) {
+            countWrapper.eq(SysBatchJobEntity::getObjectType, objectType);
             wrapper.eq(SysBatchJobEntity::getObjectType, objectType);
-        if (creator != null) wrapper.eq(SysBatchJobEntity::getCreatedBy, creator);
-        wrapper.orderByDesc(SysBatchJobEntity::getCreatedAt);
-        long total = jobMapper.selectCount(wrapper);
+        }
+        if (creator != null) {
+            countWrapper.eq(SysBatchJobEntity::getCreatedBy, creator);
+            wrapper.eq(SysBatchJobEntity::getCreatedBy, creator);
+        }
+        long total = jobMapper.selectCount(countWrapper);
         int offset = (page - 1) * pageSize;
+        wrapper.orderByDesc(SysBatchJobEntity::getCreatedAt);
         wrapper.last("LIMIT " + offset + "," + pageSize);
         List<BatchJob> items = jobMapper.selectList(wrapper).stream().map(this::toDomain).toList();
         return PageResult.of(items, page, pageSize, total);

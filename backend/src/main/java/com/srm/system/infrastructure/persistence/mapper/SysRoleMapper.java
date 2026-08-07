@@ -23,6 +23,16 @@ public interface SysRoleMapper extends BaseMapper<SysRoleEntity> {
     @Select("SELECT id FROM sys_role WHERE role_code = #{roleCode} AND status = 'ACTIVE'")
     Long findIdByRoleCode(@Param("roleCode") String roleCode);
 
+    @Select("""
+            SELECT COUNT(*)
+            FROM sys_user_role ur
+            JOIN sys_user u ON u.id = ur.user_id
+            WHERE ur.role_id = (SELECT id FROM sys_role WHERE role_code = #{roleCode} AND status = 'ACTIVE')
+              AND ur.status = 'ACTIVE'
+              AND u.status = 'ACTIVE'
+            """)
+    long countActiveUsersByRoleCode(@Param("roleCode") String roleCode);
+
     @Select("SELECT id FROM sys_user_role WHERE role_id = #{roleId} AND status = 'ACTIVE' FOR UPDATE")
     List<Long> lockActiveAssignments(@Param("roleId") long roleId);
 

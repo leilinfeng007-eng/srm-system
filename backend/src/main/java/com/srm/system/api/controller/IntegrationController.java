@@ -22,9 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class IntegrationController {
 
     private final IntegrationApplicationService integrationService;
+    private final com.srm.system.application.service.SystemGovernanceFacade queryRepo;
 
-    public IntegrationController(IntegrationApplicationService integrationService) {
+    public IntegrationController(IntegrationApplicationService integrationService,
+                                 com.srm.system.application.service.SystemGovernanceFacade queryRepo) {
         this.integrationService = integrationService;
+        this.queryRepo = queryRepo;
     }
 
     @GetMapping("/inbox-events")
@@ -32,8 +35,12 @@ public class IntegrationController {
     public ApiResponse<PageResult<InboxEvent>> listInbox(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String status) {
-        return ApiResponse.success(integrationService.listInbox(page, size, status));
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String sourceSystem,
+            @RequestParam(required = false) String objectType,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime from,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime to) {
+        return ApiResponse.success(integrationService.listInbox(page, size, status, sourceSystem, objectType, from, to));
     }
 
     @GetMapping("/outbox-events")
@@ -41,8 +48,38 @@ public class IntegrationController {
     public ApiResponse<PageResult<OutboxEvent>> listOutbox(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String status) {
-        return ApiResponse.success(integrationService.listOutbox(page, size, status));
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String eventType,
+            @RequestParam(required = false) String objectType,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime from,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime to) {
+        return ApiResponse.success(integrationService.listOutbox(page, size, status, eventType, objectType, from, to));
+    }
+
+    @GetMapping("/inbox-events/{id}")
+    @PreAuthorize("hasAuthority('system:integration-job:view')")
+    public ApiResponse<InboxEvent> getInbox(@PathVariable Long id) {
+        return ApiResponse.success(integrationService.getInbox(id));
+    }
+
+    @GetMapping("/outbox-events/{id}")
+    @PreAuthorize("hasAuthority('system:integration-job:view')")
+    public ApiResponse<OutboxEvent> getOutbox(@PathVariable Long id) {
+        return ApiResponse.success(integrationService.getOutbox(id));
+    }
+
+    @GetMapping("/inbox-events/{id}/attempts")
+    @PreAuthorize("hasAuthority('system:integration-job:view')")
+    public ApiResponse<java.util.List<?>> inboxAttempts(@PathVariable Long id) {
+        integrationService.getInbox(id);
+        return ApiResponse.success(queryRepo.eventAttempts("INBOX_EVENT", String.valueOf(id)));
+    }
+
+    @GetMapping("/outbox-events/{id}/attempts")
+    @PreAuthorize("hasAuthority('system:integration-job:view')")
+    public ApiResponse<java.util.List<?>> outboxAttempts(@PathVariable Long id) {
+        integrationService.getOutbox(id);
+        return ApiResponse.success(queryRepo.eventAttempts("OUTBOX_EVENT", String.valueOf(id)));
     }
 
     @PostMapping("/inbox-events/{id}/retry")

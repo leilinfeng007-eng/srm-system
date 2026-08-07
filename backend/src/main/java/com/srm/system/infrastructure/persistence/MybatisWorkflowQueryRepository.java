@@ -4,11 +4,16 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.srm.common.api.PageResult;
 import com.srm.common.exception.BusinessException;
 import com.srm.common.exception.ErrorCode;
+import com.srm.security.infrastructure.persistence.entity.SysUserEntity;
+import com.srm.security.infrastructure.persistence.mapper.UserAccountMapper;
 import com.srm.system.infrastructure.persistence.entity.*;
 import com.srm.system.infrastructure.persistence.mapper.*;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,14 +27,22 @@ public class MybatisWorkflowQueryRepository implements com.srm.system.domain.rep
     private final SysApprovalNodeInstanceMapper approvalNodeInstanceMapper;
     private final SysTaskMapper taskMapper;
     private final SysMessageMapper messageMapper;
+    private final SysRoleMapper roleMapper;
+    private final UserAccountMapper userAccountMapper;
+    private final PositionMapper positionMapper;
     private final Clock clock;
 
     public MybatisWorkflowQueryRepository(SysWorkflowDefinitionMapper w, SysWorkflowNodeMapper wn,
                                            SysApprovalInstanceMapper ai, SysApprovalNodeInstanceMapper ani,
-                                           SysTaskMapper t, SysMessageMapper m, Clock clock) {
+                                           SysTaskMapper t, SysMessageMapper m, SysRoleMapper roleMapper,
+                                           UserAccountMapper userAccountMapper,
+                                           PositionMapper positionMapper, Clock clock) {
         this.workflowDefMapper = w; this.workflowNodeMapper = wn;
         this.approvalInstanceMapper = ai; this.approvalNodeInstanceMapper = ani;
-        this.taskMapper = t; this.messageMapper = m; this.clock = clock;
+        this.taskMapper = t; this.messageMapper = m;
+        this.roleMapper = roleMapper; this.userAccountMapper = userAccountMapper;
+        this.positionMapper = positionMapper;
+        this.clock = clock;
     }
 
     private String actor() {
@@ -38,10 +51,18 @@ public class MybatisWorkflowQueryRepository implements com.srm.system.domain.rep
     }
 
     // === Workflow definitions ===
-    public PageResult<SysWorkflowDefinitionEntity> listWorkflows(int page, int pageSize, String status) {
+    public PageResult<SysWorkflowDefinitionEntity> listWorkflows(int page, int pageSize,
+                                                                 String status, String keyword) {
         LambdaQueryWrapper<SysWorkflowDefinitionEntity> cw = new LambdaQueryWrapper<>();
         LambdaQueryWrapper<SysWorkflowDefinitionEntity> lw = new LambdaQueryWrapper<>();
         if (status != null && !status.isBlank()) { cw.eq(SysWorkflowDefinitionEntity::getStatus, status); lw.eq(SysWorkflowDefinitionEntity::getStatus, status); }
+        if (keyword != null && !keyword.isBlank()) {
+            String like = "%" + keyword.trim() + "%";
+            cw.and(w -> w.like(SysWorkflowDefinitionEntity::getProcessCode, like)
+                    .or().like(SysWorkflowDefinitionEntity::getProcessName, like));
+            lw.and(w -> w.like(SysWorkflowDefinitionEntity::getProcessCode, like)
+                    .or().like(SysWorkflowDefinitionEntity::getProcessName, like));
+        }
         long total = workflowDefMapper.selectCount(cw);
         int offset = (page - 1) * pageSize;
         List<SysWorkflowDefinitionEntity> items = workflowDefMapper.selectList(lw.orderByDesc(SysWorkflowDefinitionEntity::getUpdatedAt).last("LIMIT " + offset + "," + pageSize));
@@ -62,6 +83,16 @@ public class MybatisWorkflowQueryRepository implements com.srm.system.domain.rep
 
     @Transactional
     public SysWorkflowDefinitionEntity createWorkflow(String processCode, String processName, String businessType, String description, List<SysWorkflowNodeEntity> nodes) {
+        if (processCode == null || processCode.isBlank()) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Process code is required");
+        }
+        if (processName == null || processName.isBlank()) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Process name is required");
+        }
+        if (businessType == null || businessType.isBlank()) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Business type is required");
+        }
+        validateNodes(nodes);
         List<SysWorkflowDefinitionEntity> existingVersions = workflowDefMapper.selectList(
                 new LambdaQueryWrapper<SysWorkflowDefinitionEntity>()
                         .eq(SysWorkflowDefinitionEntity::getProcessCode, processCode)
@@ -95,6 +126,10 @@ public class MybatisWorkflowQueryRepository implements com.srm.system.domain.rep
         if ("PUBLISHED".equals(def.getStatus())) {
             throw new BusinessException(ErrorCode.CONFLICT, "Published workflow cannot be modified");
         }
+        if (nodes != null) validateNodes(nodes);
+        if (processName != null && processName.isBlank()) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Process name is required");
+        }
         if (processName != null) def.setProcessName(processName);
         if (description != null) def.setDescription(description);
         def.setUpdatedBy(actor());
@@ -113,10 +148,20 @@ public class MybatisWorkflowQueryRepository implements com.srm.system.domain.rep
         if ("PUBLISHED".equals(def.getStatus())) {
             throw new BusinessException(ErrorCode.CONFLICT, "Workflow already published");
         }
-        long nodeCount = workflowNodeMapper.selectCount(new LambdaQueryWrapper<SysWorkflowNodeEntity>()
-                .eq(SysWorkflowNodeEntity::getWorkflowId, id));
-        if (nodeCount == 0) {
+        List<SysWorkflowNodeEntity> nodes = workflowNodeMapper.selectList(
+                new LambdaQueryWrapper<SysWorkflowNodeEntity>()
+                        .eq(SysWorkflowNodeEntity::getWorkflowId, id)
+                        .orderByAsc(SysWorkflowNodeEntity::getSortOrder));
+        if (nodes.isEmpty()) {
             throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Cannot publish workflow without nodes");
+        }
+        validateNodes(nodes);
+        for (SysWorkflowNodeEntity node : nodes) {
+            if (!assigneeResolvable(node.getAssigneeType(), node.getAssigneeValue())) {
+                throw new BusinessException(ErrorCode.VALIDATION_ERROR,
+                        "Approval node '" + node.getNodeCode()
+                                + "' has no resolvable active approvers");
+            }
         }
         def.setStatus("PUBLISHED");
         def.setUpdatedBy(actor());
@@ -279,5 +324,78 @@ public class MybatisWorkflowQueryRepository implements com.srm.system.domain.rep
             messageMapper.updateById(m);
         }
         return list.size();
+    }
+
+    // === Node validation ===
+    public void validateNodes(List<SysWorkflowNodeEntity> nodes) {
+        if (nodes == null || nodes.isEmpty()) return;
+        Set<String> codes = new LinkedHashSet<>();
+        for (SysWorkflowNodeEntity node : nodes) {
+            if (node.getNodeCode() == null || node.getNodeCode().isBlank()) {
+                throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Node code is required");
+            }
+            if (!codes.add(node.getNodeCode().trim())) {
+                throw new BusinessException(ErrorCode.VALIDATION_ERROR,
+                        "Duplicate node code: " + node.getNodeCode());
+            }
+            if (node.getNodeName() == null || node.getNodeName().isBlank()) {
+                throw new BusinessException(ErrorCode.VALIDATION_ERROR,
+                        "Node name is required for node " + node.getNodeCode());
+            }
+            String nodeType = node.getNodeType() == null ? "" : node.getNodeType().trim().toUpperCase(Locale.ROOT);
+            if (!"APPROVAL".equals(nodeType)) {
+                throw new BusinessException(ErrorCode.VALIDATION_ERROR,
+                        "Unsupported node type: " + node.getNodeType());
+            }
+            String assigneeType = node.getAssigneeType() == null ? ""
+                    : node.getAssigneeType().trim().toUpperCase(Locale.ROOT);
+            if (!List.of("USER", "ROLE", "POSITION").contains(assigneeType)) {
+                throw new BusinessException(ErrorCode.VALIDATION_ERROR,
+                        "Unsupported assignee type: " + node.getAssigneeType());
+            }
+            if (node.getAssigneeValue() == null || node.getAssigneeValue().isBlank()) {
+                throw new BusinessException(ErrorCode.VALIDATION_ERROR,
+                        "Assignee is required for node " + node.getNodeCode());
+            }
+            if (node.getDurationHours() != null && node.getDurationHours() < 0) {
+                throw new BusinessException(ErrorCode.VALIDATION_ERROR,
+                        "Duration hours cannot be negative for node " + node.getNodeCode());
+            }
+        }
+    }
+
+    public boolean assigneeResolvable(String assigneeType, String assigneeValue) {
+        String type = assigneeType == null ? "" : assigneeType.trim().toUpperCase(Locale.ROOT);
+        if (assigneeValue == null || assigneeValue.isBlank()) return false;
+        switch (type) {
+            case "USER" -> {
+                Long userId = parseLong(assigneeValue.trim());
+                if (userId == null) return false;
+                SysUserEntity user = userAccountMapper.selectById(userId);
+                return user != null && "ACTIVE".equals(user.getStatus());
+            }
+            case "ROLE" -> {
+                if (roleMapper.findIdByRoleCode(assigneeValue.trim()) == null) return false;
+                return roleMapper.countActiveUsersByRoleCode(assigneeValue.trim()) > 0;
+            }
+            case "POSITION" -> {
+                Long positionId = parseLong(assigneeValue.trim());
+                if (positionId == null) return false;
+                var position = positionMapper.selectById(positionId);
+                if (position == null || !"ACTIVE".equals(position.getStatus())) return false;
+                return positionMapper.countActiveUsers(positionId) > 0;
+            }
+            default -> {
+                return false;
+            }
+        }
+    }
+
+    private Long parseLong(String value) {
+        try {
+            return Long.valueOf(value);
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
     }
 }

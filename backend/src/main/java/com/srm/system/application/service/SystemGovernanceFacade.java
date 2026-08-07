@@ -21,14 +21,18 @@ public interface SystemGovernanceFacade {
     ApprovalView approval(Long id, Long userId);
     List<ApprovalNodeView> approvalNodes(Long id, Long userId);
 
-    PageResult<?> auditLogs(int page, int pageSize, String actionCode, String targetType);
+    PageResult<?> auditLogs(int page, int pageSize, String operatorName, String actionCode,
+                            String targetType, String targetId, String resultCode, String traceId,
+                            java.time.LocalDateTime from, java.time.LocalDateTime to);
+    Object auditLog(Long id);
+    List<?> eventAttempts(String targetType, String targetId);
 
     PageResult<?> batchJobs(int page, int pageSize, String objectType);
     Object batchJob(Long id);
     List<?> batchErrors(Long id);
     Object createBatchJob(String jobType, String objectType, String idempotencyKey);
 
-    List<?> dictionaries();
+    List<?> dictionaries(String keyword, String status);
     Object dictionary(Long id);
     Object createDictionary(String code, String name, String description);
     void updateDictionary(Long id, String name, String description);
@@ -51,11 +55,14 @@ public interface SystemGovernanceFacade {
                           Integer serialLength, String resetCycle);
     void setNumberRuleStatus(Long id, String status);
     String generateNumber(String ruleCode, Long organizationId);
+    String previewNumber(String ruleCode, Long organizationId);
 
     List<?> parameters();
     Object parameter(Long id);
     Object createParameter(String code, String name, String type, String defaultValue,
                            String validationRule, Boolean approvalRequired, String description);
+    void updateParameter(Long id, String name, String type, String defaultValue,
+                         String validationRule, Boolean approvalRequired, String description);
     List<?> parameterVersions(Long parameterId);
     Object createParameterVersion(Long parameterId, String value);
     void submitParameterVersion(Long versionId);
@@ -67,7 +74,7 @@ public interface SystemGovernanceFacade {
                                Integer sortOrder, String assigneeType, String assigneeValue,
                                Integer durationHours) {}
 
-    PageResult<?> workflows(int page, int pageSize, String status);
+    PageResult<?> workflows(int page, int pageSize, String status, String keyword);
     Object workflow(Long id);
     List<?> workflowNodes(Long id);
     Object createWorkflow(String processCode, String processName, String businessType,
@@ -80,6 +87,7 @@ public interface SystemGovernanceFacade {
     PageResult<?> documentTemplates(int page, int pageSize, String templateCode);
     Object documentTemplate(Long id);
     Object createDocumentTemplate(String code, String name, String purpose, String domainCode);
+    void updateDocumentTemplate(Long id, String name, String purpose);
     void bindDocumentTemplateAttachment(Long id, Long attachmentId);
     void publishDocumentTemplate(Long id);
     void disableDocumentTemplate(Long id);

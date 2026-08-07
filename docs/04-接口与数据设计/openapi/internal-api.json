@@ -344,6 +344,30 @@
         },
         "type": "object"
       },
+      "ApiResponseListObject": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ApiResponseListOrganizationDetail": {
         "properties": {
           "code": {
@@ -1808,6 +1832,17 @@
         ],
         "type": "object"
       },
+      "DocumentTemplateUpdateRequest": {
+        "properties": {
+          "purpose": {
+            "type": "string"
+          },
+          "templateName": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "EffectivePermissionResponse": {
         "properties": {
           "authorizationPaths": {
@@ -2147,6 +2182,21 @@
             "type": "string"
           }
         },
+        "type": "object"
+      },
+      "NumberRulePreviewRequest": {
+        "properties": {
+          "orgId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "ruleCode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ruleCode"
+        ],
         "type": "object"
       },
       "NumberRuleRequest": {
@@ -4903,7 +4953,7 @@
     },
     "/api/v1/master-data/organizations/{id}": {
       "get": {
-        "operationId": "get_6",
+        "operationId": "get_8",
         "parameters": [
           {
             "in": "path",
@@ -4938,7 +4988,7 @@
         ]
       },
       "put": {
-        "operationId": "update_7",
+        "operationId": "update_9",
         "parameters": [
           {
             "in": "path",
@@ -5937,7 +5987,7 @@
     },
     "/api/v1/system/approvals/{id}": {
       "get": {
-        "operationId": "get_11",
+        "operationId": "get_12",
         "parameters": [
           {
             "in": "path",
@@ -6273,7 +6323,7 @@
         ]
       },
       "get": {
-        "operationId": "get_10",
+        "operationId": "get_11",
         "parameters": [
           {
             "in": "path",
@@ -6412,6 +6462,14 @@
           },
           {
             "in": "query",
+            "name": "operatorName",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
             "name": "actionCode",
             "required": false,
             "schema": {
@@ -6423,6 +6481,48 @@
             "name": "targetType",
             "required": false,
             "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "targetId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "resultCode",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "traceId",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date-time",
               "type": "string"
             }
           }
@@ -6445,6 +6545,43 @@
           }
         ],
         "summary": "审计日志分页查询",
+        "tags": [
+          "audit-log-controller"
+        ]
+      }
+    },
+    "/api/v1/system/audit-logs/{id}": {
+      "get": {
+        "operationId": "get_10",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseObject"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "审计日志详情",
         "tags": [
           "audit-log-controller"
         ]
@@ -6861,7 +6998,7 @@
     },
     "/api/v1/system/departments/{id}": {
       "get": {
-        "operationId": "get_5",
+        "operationId": "get_7",
         "parameters": [
           {
             "in": "path",
@@ -6896,7 +7033,7 @@
         ]
       },
       "put": {
-        "operationId": "update_6",
+        "operationId": "update_8",
         "parameters": [
           {
             "in": "path",
@@ -7018,6 +7155,24 @@
     "/api/v1/system/dictionaries": {
       "get": {
         "operationId": "list_7",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "keyword",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -7272,7 +7427,7 @@
     },
     "/api/v1/system/dictionaries/{id}": {
       "get": {
-        "operationId": "get_4",
+        "operationId": "get_6",
         "parameters": [
           {
             "in": "path",
@@ -7302,7 +7457,7 @@
         ]
       },
       "put": {
-        "operationId": "update_5",
+        "operationId": "update_7",
         "parameters": [
           {
             "in": "path",
@@ -7488,7 +7643,7 @@
     },
     "/api/v1/system/document-templates/{id}": {
       "get": {
-        "operationId": "get_8",
+        "operationId": "get_5",
         "parameters": [
           {
             "in": "path",
@@ -7513,6 +7668,46 @@
           }
         },
         "summary": "Get document template",
+        "tags": [
+          "document-template-controller"
+        ]
+      },
+      "put": {
+        "operationId": "update_6",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentTemplateUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Update document template",
         "tags": [
           "document-template-controller"
         ]
@@ -7688,6 +7883,40 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "sourceSystem",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "objectType",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -7732,6 +7961,70 @@
           }
         },
         "summary": "Receive integration",
+        "tags": [
+          "integration-controller"
+        ]
+      }
+    },
+    "/api/v1/system/inbox-events/{id}": {
+      "get": {
+        "operationId": "getInbox",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseInboxEvent"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Get integration",
+        "tags": [
+          "integration-controller"
+        ]
+      }
+    },
+    "/api/v1/system/inbox-events/{id}/attempts": {
+      "get": {
+        "operationId": "inboxAttempts",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListObject"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Execute integration",
         "tags": [
           "integration-controller"
         ]
@@ -7880,9 +8173,40 @@
         ]
       }
     },
+    "/api/v1/system/number-rules/preview": {
+      "post": {
+        "operationId": "preview",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NumberRulePreviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseString"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Execute number rule",
+        "tags": [
+          "number-rule-controller"
+        ]
+      }
+    },
     "/api/v1/system/number-rules/{id}": {
       "put": {
-        "operationId": "update_4",
+        "operationId": "update_5",
         "parameters": [
           {
             "in": "path",
@@ -8017,6 +8341,40 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "eventType",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "objectType",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -8061,6 +8419,70 @@
           }
         },
         "summary": "Create integration",
+        "tags": [
+          "integration-controller"
+        ]
+      }
+    },
+    "/api/v1/system/outbox-events/{id}": {
+      "get": {
+        "operationId": "getOutbox",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOutboxEvent"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Get integration",
+        "tags": [
+          "integration-controller"
+        ]
+      }
+    },
+    "/api/v1/system/outbox-events/{id}/attempts": {
+      "get": {
+        "operationId": "outboxAttempts",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListObject"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Execute integration",
         "tags": [
           "integration-controller"
         ]
@@ -8150,7 +8572,7 @@
     },
     "/api/v1/system/parameters/{id}": {
       "get": {
-        "operationId": "get_7",
+        "operationId": "get_4",
         "parameters": [
           {
             "in": "path",
@@ -8175,6 +8597,46 @@
           }
         },
         "summary": "Get parameter",
+        "tags": [
+          "parameter-controller"
+        ]
+      },
+      "put": {
+        "operationId": "update_4",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParameterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Update parameter",
         "tags": [
           "parameter-controller"
         ]
@@ -9783,6 +10245,14 @@
           {
             "in": "query",
             "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "keyword",
             "required": false,
             "schema": {
               "type": "string"

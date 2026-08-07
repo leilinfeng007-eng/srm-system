@@ -23,9 +23,17 @@ public class MybatisDictionaryRepository {
         this.itemMapper = itemMapper;
     }
 
-    public List<SysDictionaryEntity> listDictionaries() {
-        return dictMapper.selectList(new LambdaQueryWrapper<SysDictionaryEntity>()
-                .orderByAsc(SysDictionaryEntity::getDictCode));
+    public List<SysDictionaryEntity> listDictionaries(String keyword, String status) {
+        LambdaQueryWrapper<SysDictionaryEntity> query = new LambdaQueryWrapper<>();
+        if (keyword != null && !keyword.isBlank()) {
+            String like = "%" + keyword.trim() + "%";
+            query.and(w -> w.like(SysDictionaryEntity::getDictCode, like)
+                    .or().like(SysDictionaryEntity::getDictName, like));
+        }
+        if (status != null && !status.isBlank()) {
+            query.eq(SysDictionaryEntity::getStatus, status);
+        }
+        return dictMapper.selectList(query.orderByAsc(SysDictionaryEntity::getDictCode));
     }
 
     public SysDictionaryEntity getDictionary(Long id) {
@@ -36,6 +44,9 @@ public class MybatisDictionaryRepository {
 
     @Transactional
     public SysDictionaryEntity createDict(String dictCode, String dictName, String description) {
+        if (dictCode == null || dictCode.isBlank() || dictName == null || dictName.isBlank()) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Dictionary code and name are required");
+        }
         if (dictMapper.selectCount(new LambdaQueryWrapper<SysDictionaryEntity>()
                 .eq(SysDictionaryEntity::getDictCode, dictCode)) > 0)
             throw new BusinessException(ErrorCode.CONFLICT, "Dictionary code already exists");
@@ -50,6 +61,9 @@ public class MybatisDictionaryRepository {
     public void updateDict(Long id, String dictName, String description) {
         var e = dictMapper.selectById(id);
         if (e == null) throw new BusinessException(ErrorCode.RESOURCE_NOT_FOUND);
+        if (dictName != null && dictName.isBlank()) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Dictionary name is required");
+        }
         if (dictName != null) e.setDictName(dictName);
         if (description != null) e.setDescription(description);
         e.setUpdatedBy(actor());
@@ -60,6 +74,7 @@ public class MybatisDictionaryRepository {
     public void toggleDict(Long id, String status) {
         var e = dictMapper.selectById(id);
         if (e == null) throw new BusinessException(ErrorCode.RESOURCE_NOT_FOUND);
+        validateStatus(status);
         e.setStatus(status); e.setUpdatedBy(actor());
         dictMapper.updateById(e);
     }
@@ -72,6 +87,15 @@ public class MybatisDictionaryRepository {
 
     @Transactional
     public SysDictionaryItemEntity createItem(Long dictId, String itemCode, String itemName, Integer sortOrder) {
+        var dict = dictMapper.selectById(dictId);
+        if (dict == null) throw new BusinessException(ErrorCode.RESOURCE_NOT_FOUND);
+        if (!"ACTIVE".equals(dict.getStatus())) {
+            throw new BusinessException(ErrorCode.CONFLICT,
+                    "Inactive dictionaries cannot accept new items");
+        }
+        if (itemCode == null || itemCode.isBlank() || itemName == null || itemName.isBlank()) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Item code and name are required");
+        }
         if (itemMapper.selectCount(new LambdaQueryWrapper<SysDictionaryItemEntity>()
                 .eq(SysDictionaryItemEntity::getDictId, dictId)
                 .eq(SysDictionaryItemEntity::getItemCode, itemCode)) > 0)
@@ -88,6 +112,9 @@ public class MybatisDictionaryRepository {
     public void updateItem(Long id, String itemName, Integer sortOrder) {
         var e = itemMapper.selectById(id);
         if (e == null) throw new BusinessException(ErrorCode.RESOURCE_NOT_FOUND);
+        if (itemName != null && itemName.isBlank()) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Item name is required");
+        }
         if (itemName != null) e.setItemName(itemName);
         if (sortOrder != null) e.setSortOrder(sortOrder);
         e.setUpdatedBy(actor());
@@ -98,8 +125,22 @@ public class MybatisDictionaryRepository {
     public void toggleItem(Long id, String status) {
         var e = itemMapper.selectById(id);
         if (e == null) throw new BusinessException(ErrorCode.RESOURCE_NOT_FOUND);
+        validateStatus(status);
+        if ("ACTIVE".equals(status)) {
+            var dict = dictMapper.selectById(e.getDictId());
+            if (dict == null || !"ACTIVE".equals(dict.getStatus())) {
+                throw new BusinessException(ErrorCode.CONFLICT,
+                        "Items of an inactive dictionary cannot be enabled");
+            }
+        }
         e.setStatus(status); e.setUpdatedBy(actor());
         itemMapper.updateById(e);
+    }
+
+    private void validateStatus(String status) {
+        if (!List.of("ACTIVE", "INACTIVE").contains(status)) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Invalid status: " + status);
+        }
     }
 
     private String actor() {

@@ -23,8 +23,9 @@ public class WorkflowController {
     public ApiResponse<?> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(required = false) String status) {
-        return ApiResponse.success(repo.workflows(page, pageSize, status));
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String keyword) {
+        return ApiResponse.success(repo.workflows(page, pageSize, status, keyword));
     }
 
     @GetMapping("/{id}")

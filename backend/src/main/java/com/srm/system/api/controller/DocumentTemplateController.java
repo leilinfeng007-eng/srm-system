@@ -47,6 +47,14 @@ public class DocumentTemplateController {
                 request.templateName(), request.purpose(), request.domainCode()));
     }
 
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('system:document-template:update')")
+    public ApiResponse<Void> update(@PathVariable Long id,
+                                    @RequestBody com.srm.system.api.request.DocumentTemplateUpdateRequest request) {
+        governance.updateDocumentTemplate(id, request.templateName(), request.purpose());
+        return ApiResponse.success();
+    }
+
     @PutMapping("/{id}/attachment")
     @PreAuthorize("hasAuthority('system:document-template:update')")
     public ApiResponse<Void> bindAttachment(@PathVariable Long id,

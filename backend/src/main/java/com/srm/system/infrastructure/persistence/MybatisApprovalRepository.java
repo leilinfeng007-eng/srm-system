@@ -5,6 +5,7 @@ import com.srm.common.exception.ErrorCode;
 import com.srm.security.auth.SrmPrincipal;
 import com.srm.system.infrastructure.persistence.entity.*;
 import com.srm.security.infrastructure.persistence.entity.SysUserRoleEntity;
+import com.srm.security.infrastructure.persistence.entity.SysUserEntity;
 import com.srm.security.infrastructure.persistence.mapper.UserRoleMapper;
 import com.srm.security.infrastructure.persistence.mapper.UserAccountMapper;
 import com.srm.system.infrastructure.persistence.mapper.*;
@@ -328,6 +329,19 @@ public class MybatisApprovalRepository implements com.srm.system.domain.reposito
                         var user = userAccountMapper.selectById(userId);
                         return user != null && "ACTIVE".equals(user.getStatus());
                     })
+                    .distinct()
+                    .collect(Collectors.toList());
+        } else if ("POSITION".equals(node.getAssigneeType())) {
+            final Long positionId;
+            try {
+                positionId = Long.parseLong(node.getAssigneeValue());
+            } catch (NumberFormatException e) {
+                return Collections.emptyList();
+            }
+            return userAccountMapper.selectList(new LambdaQueryWrapper<SysUserEntity>()
+                            .eq(SysUserEntity::getMainPositionId, positionId)
+                            .eq(SysUserEntity::getStatus, "ACTIVE")).stream()
+                    .map(SysUserEntity::getId)
                     .distinct()
                     .collect(Collectors.toList());
         }

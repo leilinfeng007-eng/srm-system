@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 public class DictionaryController {
     private final SystemGovernanceFacade r;
     public DictionaryController(SystemGovernanceFacade r) { this.r = r; }
-    @GetMapping @PreAuthorize("hasAuthority('system:dictionary:view')") public ApiResponse<?> list() { return ApiResponse.success(r.dictionaries()); }
+    @GetMapping @PreAuthorize("hasAuthority('system:dictionary:view')") public ApiResponse<?> list(@RequestParam(required=false) String keyword,@RequestParam(required=false) String status) { return ApiResponse.success(r.dictionaries(keyword,status)); }
     @GetMapping("/{id}") @PreAuthorize("hasAuthority('system:dictionary:view')") public ApiResponse<?> get(@PathVariable Long id) { return ApiResponse.success(r.dictionary(id)); }
     @PostMapping @PreAuthorize("hasAuthority('system:dictionary:create')") public ApiResponse<?> create(@RequestBody DictionaryRequest b) { return ApiResponse.success(r.createDictionary(b.dictCode(),b.dictName(),b.description())); }
     @PutMapping("/{id}") @PreAuthorize("hasAuthority('system:dictionary:update')") public ApiResponse<Void> update(@PathVariable Long id,@RequestBody DictionaryRequest b) { r.updateDictionary(id,b.dictName(),b.description()); return ApiResponse.success(); }

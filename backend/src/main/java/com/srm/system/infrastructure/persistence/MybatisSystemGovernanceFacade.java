@@ -27,6 +27,7 @@ public class MybatisSystemGovernanceFacade implements SystemGovernanceFacade {
     private final AttachmentRepository attachments;
     private final AuditRecorder audit;
     private final DataScopeAuthorizationService scopes;
+    private final MybatisAuditRepository auditRecords;
 
     public MybatisSystemGovernanceFacade(MybatisWorkflowQueryRepository workflows,
                                          OperationLogMapper auditLogs,
@@ -37,7 +38,8 @@ public class MybatisSystemGovernanceFacade implements SystemGovernanceFacade {
                                          SysDocumentTemplateMapper templates,
                                          AttachmentRepository attachments,
                                          AuditRecorder audit,
-                                         DataScopeAuthorizationService scopes) {
+                                         DataScopeAuthorizationService scopes,
+                                         MybatisAuditRepository auditRecords) {
         this.workflows = workflows;
         this.auditLogs = auditLogs;
         this.batchJobs = batchJobs;
@@ -48,6 +50,7 @@ public class MybatisSystemGovernanceFacade implements SystemGovernanceFacade {
         this.attachments = attachments;
         this.audit = audit;
         this.scopes = scopes;
+        this.auditRecords = auditRecords;
     }
 
     @Override public PageResult<ApprovalView> approvals(int p,int s,String status,Long userId){
@@ -58,7 +61,10 @@ public class MybatisSystemGovernanceFacade implements SystemGovernanceFacade {
     @Override public List<ApprovalNodeView> approvalNodes(Long id,Long userId){workflows.requireApprovalVisible(id,userId);return workflows.listApprovalNodes(id).stream().map(this::approvalNodeView).toList();}
 
     @Override
-    public PageResult<?> auditLogs(int page, int pageSize, String actionCode, String targetType) {
+    public PageResult<?> auditLogs(int page, int pageSize, String operatorName, String actionCode,
+                                   String targetType, String targetId, String resultCode,
+                                   String traceId, java.time.LocalDateTime from,
+                                   java.time.LocalDateTime to) {
         if (page < 1 || pageSize < 1 || pageSize > 200) {
             throw new com.srm.common.exception.BusinessException(
                     com.srm.common.exception.ErrorCode.VALIDATION_ERROR, "Invalid paging parameters");
@@ -74,6 +80,30 @@ public class MybatisSystemGovernanceFacade implements SystemGovernanceFacade {
             count.eq(SysOperationLogEntity::getTargetType, targetType);
             items.eq(SysOperationLogEntity::getTargetType, targetType);
         }
+        if (targetId != null && !targetId.isBlank()) {
+            count.eq(SysOperationLogEntity::getTargetId, targetId);
+            items.eq(SysOperationLogEntity::getTargetId, targetId);
+        }
+        if (operatorName != null && !operatorName.isBlank()) {
+            count.eq(SysOperationLogEntity::getOperatorName, operatorName);
+            items.eq(SysOperationLogEntity::getOperatorName, operatorName);
+        }
+        if (resultCode != null && !resultCode.isBlank()) {
+            count.eq(SysOperationLogEntity::getResultCode, resultCode);
+            items.eq(SysOperationLogEntity::getResultCode, resultCode);
+        }
+        if (traceId != null && !traceId.isBlank()) {
+            count.eq(SysOperationLogEntity::getTraceId, traceId);
+            items.eq(SysOperationLogEntity::getTraceId, traceId);
+        }
+        if (from != null) {
+            count.ge(SysOperationLogEntity::getOccurredAt, from);
+            items.ge(SysOperationLogEntity::getOccurredAt, from);
+        }
+        if (to != null) {
+            count.le(SysOperationLogEntity::getOccurredAt, to);
+            items.le(SysOperationLogEntity::getOccurredAt, to);
+        }
         if (!scope.isAllScope()) {
             Long userId = scope.isSelfScope() ? scope.ownerUserId() : -1L;
             count.eq(SysOperationLogEntity::getUserId, userId);
@@ -86,12 +116,29 @@ public class MybatisSystemGovernanceFacade implements SystemGovernanceFacade {
         return PageResult.of(result, page, pageSize, total);
     }
 
+    @Override
+    public Object auditLog(Long id) {
+        scopes.requireRead("system:audit-log:view", "system", "OWNER");
+        var entity = auditLogs.selectById(id);
+        if (entity == null) {
+            throw new com.srm.common.exception.BusinessException(
+                    com.srm.common.exception.ErrorCode.RESOURCE_NOT_FOUND);
+        }
+        return entity;
+    }
+
+    @Override
+    public List<?> eventAttempts(String targetType, String targetId) {
+        scopes.requireRead("system:integration-job:view", "system", "OWNER");
+        return auditRecords.findByTarget(targetType, targetId);
+    }
+
     @Override public PageResult<?> batchJobs(int p,int s,String type){return batchJobs.listJobs(p,s,type);}
     @Override public Object batchJob(Long id){return batchJobs.getJob(id);}
     @Override public List<?> batchErrors(Long id){return batchJobs.listErrors(id);}
     @Override public Object createBatchJob(String jt,String ot,String key){return batchJobs.createJob(jt,ot,key);}
 
-    @Override public List<?> dictionaries(){requireAll("system:dictionary:view",false);return dictionaries.listDictionaries();}
+    @Override public List<?> dictionaries(String keyword,String status){requireAll("system:dictionary:view",false);return dictionaries.listDictionaries(keyword,status);}
     @Override public Object dictionary(Long id){requireAll("system:dictionary:view",false);return dictionaries.getDictionary(id);}
     @Override public Object createDictionary(String c,String n,String d){requireAll("system:dictionary:create",true);Object value=dictionaries.createDict(c,n,d);audit.record("DICTIONARY_CREATED","DICTIONARY",entityId(value),"SUCCESS",null,"code="+c+",name="+n,null);return value;}
     @Override public void updateDictionary(Long id,String n,String d){requireAll("system:dictionary:update",true);dictionaries.updateDict(id,n,d);audit.record("DICTIONARY_UPDATED","DICTIONARY",String.valueOf(id),"SUCCESS",null,"name="+n,null);}
@@ -103,18 +150,20 @@ public class MybatisSystemGovernanceFacade implements SystemGovernanceFacade {
 
     @Override public PageResult<?> messages(int p,int s,Long u,String status){return workflows.listMyMessages(p,s,u,status);}
     @Override public long unreadMessages(Long u){return workflows.countUnreadMessages(u);}
-    @Override public void markMessageRead(Long id,Long u){workflows.markMessageRead(id,u);}
-    @Override public int markAllMessagesRead(Long u){return workflows.markAllMessagesRead(u);}
+    @Override public void markMessageRead(Long id,Long u){workflows.markMessageRead(id,u);audit.record("MESSAGE_MARKED_READ","MESSAGE",String.valueOf(id),"SUCCESS",null,"status=READ",null);}
+    @Override public int markAllMessagesRead(Long u){int marked=workflows.markAllMessagesRead(u);audit.record("MESSAGE_ALL_MARKED_READ","MESSAGE",String.valueOf(u),"SUCCESS",null,"count="+marked,null);return marked;}
 
     @Override public List<?> numberRules(){requireAll("system:number-rule:view",false);return numberRules.listAll();}
     @Override public Object createNumberRule(String c,String n,String o,String p,String d,Integer l,String r,Boolean g){requireAll("system:number-rule:create",true);Object value=numberRules.createRule(c,n,o,p,d,l,r,g);audit.record("NUMBER_RULE_CREATED","NUMBER_RULE",entityId(value),"SUCCESS",null,"code="+c+",objectType="+o,null);return value;}
     @Override public void updateNumberRule(Long id,String n,String p,String d,Integer l,String r){requireAll("system:number-rule:update",true);numberRules.updateRule(id,n,p,d,l,r);audit.record("NUMBER_RULE_UPDATED","NUMBER_RULE",String.valueOf(id),"SUCCESS",null,"name="+n,null);}
     @Override public void setNumberRuleStatus(Long id,String s){requireAll("system:number-rule:"+("ACTIVE".equals(s)?"enable":"disable"),true);numberRules.toggleRule(id,s);audit.record("NUMBER_RULE_STATUS_CHANGED","NUMBER_RULE",String.valueOf(id),"SUCCESS",null,"status="+s,null);}
-    @Override public String generateNumber(String c,Long o){requireAll("system:number-rule:view",false);return numberRules.generateNumber(c,o);}
+    @Override public String generateNumber(String c,Long o){requireAll("system:number-rule:view",false);String value=numberRules.generateNumber(c,o);audit.record("NUMBER_GENERATED","NUMBER_RULE",c,"SUCCESS",null,"orgId="+o,null);return value;}
+    @Override public String previewNumber(String c,Long o){requireAll("system:number-rule:view",false);return numberRules.previewNumber(c,o);}
 
     @Override public List<?> parameters(){requireAll("system:parameter:view",false);return parameters.listAll();}
     @Override public Object parameter(Long id){requireAll("system:parameter:view",false);return parameters.getParam(id);}
     @Override public Object createParameter(String c,String n,String t,String d,String v,Boolean a,String x){requireAll("system:parameter:create",true);Object value=parameters.createParam(c,n,t,d,v,a,x);audit.record("PARAMETER_CREATED","PARAMETER",entityId(value),"SUCCESS",null,"code="+c+",type="+t,null);return value;}
+    @Override public void updateParameter(Long id,String n,String t,String d,String v,Boolean a,String x){requireAll("system:parameter:update",true);parameters.updateParam(id,n,t,d,v,a,x);audit.record("PARAMETER_UPDATED","PARAMETER",String.valueOf(id),"SUCCESS",null,"name="+n+",type="+t,null);}
     @Override public List<?> parameterVersions(Long id){requireAll("system:parameter:view",false);return parameters.listVersions(id);}
     @Override public Object createParameterVersion(Long id,String v){requireAll("system:parameter:update",true);Object value=parameters.createVersionWithApproval(id,v);audit.record("PARAMETER_VERSION_CREATED","PARAMETER_VERSION",entityId(value),"SUCCESS",null,"parameterId="+id,null);return value;}
     @Override public void submitParameterVersion(Long id){requireAll("system:parameter:submit",true);parameters.submitForApproval(id);audit.record("PARAMETER_VERSION_SUBMITTED","PARAMETER_VERSION",String.valueOf(id),"SUCCESS","status=DRAFT","status=PENDING_APPROVAL",null);}
@@ -130,7 +179,7 @@ public class MybatisSystemGovernanceFacade implements SystemGovernanceFacade {
     }
     @Override public long overdueTasks(Long u){return workflows.countOverdueTasks(u);}
 
-    @Override public PageResult<?> workflows(int p,int s,String status){requireAll("system:workflow:view",false);return workflows.listWorkflows(p,s,status);}
+    @Override public PageResult<?> workflows(int p,int s,String status,String keyword){requireAll("system:workflow:view",false);return workflows.listWorkflows(p,s,status,keyword);}
     @Override public Object workflow(Long id){requireAll("system:workflow:view",false);return workflows.getWorkflow(id);}
     @Override public List<?> workflowNodes(Long id){requireAll("system:workflow:view",false);return workflows.listWorkflowNodes(id);}
     @Override public Object createWorkflow(String c,String n,String b,String d,List<WorkflowNodeCommand> nodes){requireAll("system:workflow:create",true);Object value=workflows.createWorkflow(c,n,b,d,toNodes(nodes));audit.record("WORKFLOW_CREATED","WORKFLOW",entityId(value),"SUCCESS",null,"processCode="+c+",businessType="+b,null);return value;}
@@ -202,6 +251,24 @@ public class MybatisSystemGovernanceFacade implements SystemGovernanceFacade {
         audit.record("DOCUMENT_TEMPLATE_CREATED", "DOCUMENT_TEMPLATE", String.valueOf(entity.getId()),
                 "SUCCESS", null, "code=" + code + ",version=" + entity.getTemplateVersion(), null);
         return entity;
+    }
+
+    @Override
+    @Transactional
+    public void updateDocumentTemplate(Long id, String name, String purpose) {
+        requireAll("system:document-template:update", true);
+        var template = requiredTemplate(id);
+        if (!"DRAFT".equals(template.getStatus())) conflict("Only a draft template can be changed");
+        if (name != null && name.isBlank()) {
+            throw new com.srm.common.exception.BusinessException(
+                    com.srm.common.exception.ErrorCode.VALIDATION_ERROR, "Template name is required");
+        }
+        if (name != null) template.setTemplateName(name);
+        if (purpose != null) template.setPurpose(purpose);
+        template.setUpdatedBy(actor());
+        templates.updateById(template);
+        audit.record("DOCUMENT_TEMPLATE_UPDATED", "DOCUMENT_TEMPLATE", String.valueOf(id),
+                "SUCCESS", null, "name=" + (name != null ? name : template.getTemplateName()), null);
     }
 
     @Override

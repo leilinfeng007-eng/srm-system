@@ -61,8 +61,9 @@ public class MybatisParameterRepository implements com.srm.system.domain.reposit
         if (paramMapper.selectCount(new LambdaQueryWrapper<SysParameterEntity>()
                 .eq(SysParameterEntity::getParamCode, paramCode)) > 0)
             throw new BusinessException(ErrorCode.CONFLICT, "Parameter code already exists");
+        String normalizedType = validateTypeAndValue(paramType, defaultValue);
         var e = new SysParameterEntity();
-        e.setParamCode(paramCode); e.setParamName(paramName); e.setParamType(paramType);
+        e.setParamCode(paramCode); e.setParamName(paramName); e.setParamType(normalizedType);
         e.setDefaultValue(defaultValue); e.setValidationRule(validationRule);
         e.setApprovalRequired(approvalRequired != null && approvalRequired);
         e.setDescription(description); e.setCreatedBy(actor()); e.setUpdatedBy(actor());
@@ -71,9 +72,64 @@ public class MybatisParameterRepository implements com.srm.system.domain.reposit
     }
 
     @Transactional
+    public void updateParam(Long id, String paramName, String paramType, String defaultValue,
+                            String validationRule, Boolean approvalRequired, String description) {
+        var e = paramMapper.selectById(id);
+        if (e == null) throw new BusinessException(ErrorCode.RESOURCE_NOT_FOUND);
+        if (paramName != null && paramName.isBlank()) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Parameter name is required");
+        }
+        String type = paramType != null ? validateTypeAndValue(paramType,
+                defaultValue != null ? defaultValue : e.getDefaultValue()) : e.getParamType();
+        if (paramType != null) e.setParamType(type);
+        if (paramName != null) e.setParamName(paramName);
+        if (defaultValue != null) {
+            validateValue(type, defaultValue);
+            e.setDefaultValue(defaultValue);
+        }
+        if (validationRule != null) e.setValidationRule(validationRule);
+        if (approvalRequired != null) e.setApprovalRequired(approvalRequired);
+        if (description != null) e.setDescription(description);
+        e.setUpdatedBy(actor());
+        paramMapper.updateById(e);
+    }
+
+    private String validateTypeAndValue(String paramType, String value) {
+        String type = paramType == null ? "STRING" : paramType.trim().toUpperCase(java.util.Locale.ROOT);
+        if (!List.of("STRING", "INTEGER", "DECIMAL", "BOOLEAN", "DATE").contains(type)) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Unsupported parameter type: " + paramType);
+        }
+        validateValue(type, value);
+        return type;
+    }
+
+    public void validateValue(String paramType, String value) {
+        if (value == null || value.isBlank()) return;
+        String type = paramType == null ? "STRING" : paramType.trim().toUpperCase(java.util.Locale.ROOT);
+        try {
+            switch (type) {
+                case "INTEGER" -> Long.parseLong(value.trim());
+                case "DECIMAL" -> new java.math.BigDecimal(value.trim());
+                case "BOOLEAN" -> {
+                    String v = value.trim();
+                    if (!"true".equalsIgnoreCase(v) && !"false".equalsIgnoreCase(v)) {
+                        throw new NumberFormatException("not a boolean");
+                    }
+                }
+                case "DATE" -> java.time.LocalDate.parse(value.trim());
+                default -> { }
+            }
+        } catch (RuntimeException invalid) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR,
+                    "Value '" + value + "' does not match parameter type " + type);
+        }
+    }
+
+    @Transactional
     public SysParameterVersionEntity createVersion(Long paramId, String paramValue) {
         var param = paramMapper.selectById(paramId);
         if (param == null) throw new BusinessException(ErrorCode.RESOURCE_NOT_FOUND);
+        validateValue(param.getParamType(), paramValue);
 
         int nextVer = 1;
         var maxVer = versionMapper.selectOne(new LambdaQueryWrapper<SysParameterVersionEntity>()

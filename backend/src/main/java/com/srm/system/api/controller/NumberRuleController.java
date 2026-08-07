@@ -16,4 +16,5 @@ public class NumberRuleController {
     @PostMapping("/{id}/enable") @PreAuthorize("hasAuthority('system:number-rule:enable')") public ApiResponse<Void> enable(@PathVariable Long id) { r.setNumberRuleStatus(id,"ACTIVE"); return ApiResponse.success(); }
     @PostMapping("/{id}/disable") @PreAuthorize("hasAuthority('system:number-rule:disable')") public ApiResponse<Void> disable(@PathVariable Long id) { r.setNumberRuleStatus(id,"INACTIVE"); return ApiResponse.success(); }
     @PostMapping("/generate") @PreAuthorize("hasAuthority('system:number-rule:view')") public ApiResponse<String> generate(@RequestParam String ruleCode,@RequestParam(required=false) Long orgId) { return ApiResponse.success(r.generateNumber(ruleCode,orgId)); }
+    @PostMapping("/preview") @PreAuthorize("hasAuthority('system:number-rule:view')") public ApiResponse<String> preview(@RequestBody com.srm.system.api.request.NumberRulePreviewRequest b) { return ApiResponse.success(r.previewNumber(b.ruleCode(),b.orgId())); }
 }

@@ -32,6 +32,7 @@ public class MybatisNumberRuleRepository {
     public SysNumberRuleEntity createRule(String ruleCode, String ruleName, String objectType,
                                            String prefix, String dateFormat, Integer serialLength,
                                            String resetCycle, Boolean orgDimension) {
+        validateFields(ruleCode, ruleName, objectType, prefix, serialLength, resetCycle);
         if (ruleMapper.selectCount(new LambdaQueryWrapper<SysNumberRuleEntity>()
                 .eq(SysNumberRuleEntity::getRuleCode, ruleCode)) > 0)
             throw new BusinessException(ErrorCode.CONFLICT, "Rule code already exists");
@@ -51,6 +52,10 @@ public class MybatisNumberRuleRepository {
                             Integer serialLength, String resetCycle) {
         var e = ruleMapper.selectById(id);
         if (e == null) throw new BusinessException(ErrorCode.RESOURCE_NOT_FOUND);
+        validateFields(e.getRuleCode(), ruleName != null ? ruleName : e.getRuleName(),
+                e.getObjectType(), prefix != null ? prefix : e.getPrefix(),
+                serialLength != null ? serialLength : e.getSerialLength(),
+                resetCycle != null ? resetCycle : e.getResetCycle());
         if (ruleName != null) e.setRuleName(ruleName);
         if (prefix != null) e.setPrefix(prefix);
         if (dateFormat != null) e.setDateFormat(dateFormat);
@@ -58,6 +63,24 @@ public class MybatisNumberRuleRepository {
         if (resetCycle != null) e.setResetCycle(resetCycle);
         e.setUpdatedBy(actor());
         ruleMapper.updateById(e);
+    }
+
+    private void validateFields(String ruleCode, String ruleName, String objectType,
+                                String prefix, Integer serialLength, String resetCycle) {
+        if (ruleCode == null || ruleCode.isBlank() || ruleName == null || ruleName.isBlank()
+                || objectType == null || objectType.isBlank() || prefix == null || prefix.isBlank()) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR,
+                    "Rule code, name, object type and prefix are required");
+        }
+        if (prefix.length() > 20) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Prefix exceeds 20 characters");
+        }
+        if (serialLength != null && (serialLength < 1 || serialLength > 20)) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Serial length must be 1-20");
+        }
+        if (resetCycle != null && !List.of("NONE", "DAY", "MONTH", "YEAR").contains(resetCycle)) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Invalid reset cycle: " + resetCycle);
+        }
     }
 
     @Transactional
@@ -75,11 +98,11 @@ public class MybatisNumberRuleRepository {
 
     @Transactional
     public String generateNumber(String ruleCode, Long orgId) {
-        var rule = ruleMapper.selectOne(new LambdaQueryWrapper<SysNumberRuleEntity>()
-                .eq(SysNumberRuleEntity::getRuleCode, ruleCode)
-                .eq(SysNumberRuleEntity::getStatus, "ACTIVE"));
-        if (rule == null) throw new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "Number rule not found or inactive");
-
+        var rule = requiredActiveRule(ruleCode);
+        if (Boolean.TRUE.equals(rule.getOrganizationDimension()) && orgId == null) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR,
+                    "Organization dimension is required for this rule");
+        }
         String periodKey = computePeriodKey(rule.getResetCycle());
         Long effectiveOrgId = Boolean.TRUE.equals(rule.getOrganizationDimension()) ? orgId : 0L;
 
@@ -102,7 +125,35 @@ public class MybatisNumberRuleRepository {
                 nextSeq = seqMapper.selectCurrentForUpdate(rule.getId(), effectiveOrgId, periodKey);
             }
         }
+        return formatNumber(rule, nextSeq);
+    }
 
+    @Transactional
+    public String previewNumber(String ruleCode, Long orgId) {
+        var rule = requiredActiveRule(ruleCode);
+        if (Boolean.TRUE.equals(rule.getOrganizationDimension()) && orgId == null) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR,
+                    "Organization dimension is required for this rule");
+        }
+        String periodKey = computePeriodKey(rule.getResetCycle());
+        Long effectiveOrgId = Boolean.TRUE.equals(rule.getOrganizationDimension()) ? orgId : 0L;
+        SysNumberSequenceEntity seq = seqMapper.selectOne(new LambdaQueryWrapper<SysNumberSequenceEntity>()
+                .eq(SysNumberSequenceEntity::getRuleId, rule.getId())
+                .eq(SysNumberSequenceEntity::getOrgId, effectiveOrgId)
+                .eq(SysNumberSequenceEntity::getPeriodKey, periodKey));
+        long nextSeq = (seq == null || seq.getCurrentSequence() == null) ? 1L : seq.getCurrentSequence() + 1L;
+        return formatNumber(rule, nextSeq);
+    }
+
+    private SysNumberRuleEntity requiredActiveRule(String ruleCode) {
+        var rule = ruleMapper.selectOne(new LambdaQueryWrapper<SysNumberRuleEntity>()
+                .eq(SysNumberRuleEntity::getRuleCode, ruleCode)
+                .eq(SysNumberRuleEntity::getStatus, "ACTIVE"));
+        if (rule == null) throw new BusinessException(ErrorCode.RESOURCE_NOT_FOUND, "Number rule not found or inactive");
+        return rule;
+    }
+
+    private String formatNumber(SysNumberRuleEntity rule, long nextSeq) {
         String datePart = "";
         if (rule.getDateFormat() != null && !rule.getDateFormat().isEmpty()) {
             try {
