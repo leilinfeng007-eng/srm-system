@@ -1014,22 +1014,27 @@ class Stage1SystemManagementClosureTest {
         String suffix = String.valueOf(System.nanoTime());
         String submitterRole = "SMC_SUBMITTER_ROLE_" + suffix;
         insertRole(submitterRole, "Submitter only role");
-        users.assignRoleIfMissing(1L, submitterRole, "test");
-
-        long flowId = createWorkflow("SMC_SUBMITTER_ROLE_" + suffix, "Submitter role flow",
-                APPROVAL_BUSINESS_TYPE, List.of(node("N1", "Self approver", "ROLE", submitterRole, 48)));
-        mockMvc.perform(post("/api/v1/system/workflows/" + flowId + "/publish")
-                        .header(HttpHeaders.AUTHORIZATION, adminToken))
-                .andExpect(status().isOk());
-
-        asAdmin();
         try {
+            users.assignRoleIfMissing(1L, submitterRole, "test");
+
+            long flowId = createWorkflow("SMC_SUBMITTER_ROLE_" + suffix, "Submitter role flow",
+                    APPROVAL_BUSINESS_TYPE, List.of(node("N1", "Self approver", "ROLE", submitterRole, 48)));
+            mockMvc.perform(post("/api/v1/system/workflows/" + flowId + "/publish")
+                            .header(HttpHeaders.AUTHORIZATION, adminToken))
+                    .andExpect(status().isOk());
+
+            asAdmin();
             assertThatThrownBy(() -> approvalService.submit(APPROVAL_BUSINESS_TYPE,
                     "SMC-SELF-BIZ-" + suffix, "Self approval"))
                     .isInstanceOf(com.srm.common.exception.BusinessException.class)
                     .hasMessageContaining("no eligible approver");
         } finally {
             clearAuth();
+            jdbc.update("""
+                    DELETE FROM sys_user_role
+                     WHERE user_id = 1
+                       AND role_id = (SELECT id FROM sys_role WHERE role_code = ?)
+                    """, submitterRole);
         }
     }
 

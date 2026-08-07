@@ -48,12 +48,19 @@ class AuthFlowIntegrationTest {
         Cookie firstRefreshCookie = login.getResponse().getCookie("SRM_REFRESH");
         assertThat(firstRefreshCookie).isNotNull();
 
-        mockMvc.perform(get("/api/v1/auth/me")
+        MvcResult me = mockMvc.perform(get("/api/v1/auth/me")
                         .header(HttpHeaders.AUTHORIZATION, bearer(firstAccessToken)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("0"))
                 .andExpect(jsonPath("$.data.username").value("stage0_admin"))
-                .andExpect(jsonPath("$.data.roles[0]").value("SUPER_ADMIN"));
+                .andReturn();
+        JsonNode roles = objectMapper.readTree(me.getResponse().getContentAsString())
+                .path("data").path("roles");
+        assertThat(roles.isArray()).isTrue();
+        assertThat(java.util.stream.StreamSupport.stream(roles.spliterator(), false)
+                .map(JsonNode::asText).toList())
+                .as("bootstrap admin roles must include SUPER_ADMIN regardless of order")
+                .contains("SUPER_ADMIN");
 
         MvcResult refresh = mockMvc.perform(post("/api/v1/auth/refresh")
                         .cookie(firstRefreshCookie))
